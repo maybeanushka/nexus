@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nexus Clearance Portal
 
-## Getting Started
+Nexus is a Next.js application for student clearance workflows. It includes student registration and login, document submission, staged administrative review, library dues, payment receipts, certificate generation, and certificate verification.
 
-First, run the development server:
+## Requirements
+
+- Node.js 20+
+- npm
+- MongoDB connection string
+
+## Environment Setup
+
+Create a local environment file from the example:
+
+```bash
+cp .env.example .env.local
+```
+
+Then fill in the required values.
+
+### Required Variables
+
+```bash
+MONGODB_URI=mongodb+srv://user:password@example.mongodb.net/nexus?retryWrites=true&w=majority
+```
+
+### Optional Variables
+
+```bash
+NEXUS_APP_URL=http://localhost:3000
+
+NEXUS_EMAIL=your-email@example.com
+NEXUS_PASSWORD=your-email-app-password
+
+FORMSPREE_ID=your-formspree-form-id
+
+AWS_ACCESS_KEY_ID=your-aws-access-key-id
+AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
+AWS_REGION=us-east-1
+AWS_BUCKET_NAME=your-s3-bucket-name
+```
+
+If AWS variables are not configured, uploads fall back to local storage under `public/uploads`.
+
+If `FORMSPREE_ID` is not configured, Formspree-based notifications are skipped.
+
+`NEXUS_EMAIL` and `NEXUS_PASSWORD` are required only when running the email nudge script.
+
+## Local Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Background Nudge Script
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The nudge script loads values from `.env.local`.
 
-## Learn More
+```bash
+npm run nudge
+```
 
-To learn more about Next.js, take a look at the following resources:
+Required for this script:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+MONGODB_URI=
+NEXUS_EMAIL=
+NEXUS_PASSWORD=
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Security Notes
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Never commit `.env.local` or any real credentials.
+- Rotate any credential that has ever been committed or shared.
+- Use `.env.example` only for placeholder values.
+- Configure production environment variables in the deployment platform, not in source code.
