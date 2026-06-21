@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "nudge": "node scripts/start_nudge.js"
+    "nudge": "node scripts/start_nudge.js",
+    "seed:admin": "node scripts/seed_admin.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1032.0",
