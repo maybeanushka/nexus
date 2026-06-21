@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import { Application, AuditLog, User } from '@/lib/models';
+import { env } from '@/lib/env';
 
 export const runtime = 'nodejs';
 
@@ -52,12 +53,10 @@ export async function GET() {
     }
   }
 
-  if (delays.length > 0) {
-    const formspreeId = process.env.FORMSPREE_ID || 'mjkgvdyv';
-    
+  if (delays.length > 0 && env.FORMSPREE_ID) {
     for (const delay of delays) {
       try {
-        await fetch(`https://formspree.io/f/${formspreeId}`, {
+        await fetch(`https://formspree.io/f/${env.FORMSPREE_ID}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -71,6 +70,8 @@ export async function GET() {
         console.error("Nudge failed for", delay.appId, e);
       }
     }
+  } else if (delays.length > 0) {
+    console.warn('FORMSPREE_ID is not configured. Skipping nudge notifications.');
   }
 
   return NextResponse.json({ 

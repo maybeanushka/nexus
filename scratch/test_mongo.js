@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
+const path = require('path');
 
-const MONGODB_URI = "mongodb://admin:admin%40123@ac-ctfqwjk-shard-00-00.tl4ieoh.mongodb.net:27017,ac-ctfqwjk-shard-00-01.tl4ieoh.mongodb.net:27017,ac-ctfqwjk-shard-00-02.tl4ieoh.mongodb.net:27017/nexus?ssl=true&authSource=admin&retryWrites=true&w=majority";
+require('dotenv').config({ path: path.resolve(__dirname, '../.env.local') });
+
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  console.error("Missing required environment variable: MONGODB_URI");
+  process.exit(1);
+}
 
 console.log("Attempting to connect to MongoDB...");
 

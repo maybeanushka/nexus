@@ -9,6 +9,7 @@ import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
 import { uploadToS3 } from './s3';
 import mongoose from 'mongoose';
+import { env } from './env';
 
 export async function loginAction(prevState: any, formData: FormData) {
   await dbConnect();
@@ -170,9 +171,13 @@ export async function submitApplication(prevState: any, formData: FormData) {
 }
 
 async function sendStudentNotification(studentEmail: string, studentName: string, stage: string, status: string, notes: string = '') {
-  const formspreeId = process.env.FORMSPREE_ID || 'mjkgvdyv';
+  if (!env.FORMSPREE_ID) {
+    console.warn('FORMSPREE_ID is not configured. Skipping student notification.');
+    return;
+  }
+
   try {
-    await fetch(`https://formspree.io/f/${formspreeId}`, {
+    await fetch(`https://formspree.io/f/${env.FORMSPREE_ID}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
