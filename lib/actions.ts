@@ -44,7 +44,7 @@ export async function registerAction(prevState: any, formData: FormData) {
   const name = formData.get('name') as string;
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
-  const role = formData.get('role') as string || 'student';
+  const role = 'student';
   const branch = formData.get('branch') as string;
 
   if (!name || !email || !password) {
@@ -68,12 +68,8 @@ export async function registerAction(prevState: any, formData: FormData) {
   });
 
   await createSession(user._id.toString());
-  
-  if (role.endsWith('admin')) {
-    redirect('/admin-portal');
-  } else {
-    redirect('/student-dashboard');
-  }
+
+  redirect('/student-dashboard');
 }
 
 export async function logoutAction() {

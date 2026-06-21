@@ -1,12 +1,11 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState } from 'react';
 import { registerAction } from '@/lib/actions';
 import Link from 'next/link';
 
 export default function RegisterPage() {
   const [state, formAction, isPending] = useActionState(registerAction, null);
-  const [role, setRole] = useState<'student' | 'lab_admin' | 'hod_admin' | 'principal_admin'>('student');
 
   return (
     <main className="flex-grow flex items-center justify-center p-6 sm:p-12 w-full">
@@ -22,45 +21,7 @@ export default function RegisterPage() {
           <div className="relative z-10">
             <h2 className="text-xl font-bold text-on-surface mb-6 tracking-tight text-center">Create Account</h2>
 
-            {/* Role Toggle */}
-            <div className="bg-slate-50 p-1.5 rounded-xl flex flex-col gap-1 mb-6">
-              <div className="flex gap-1">
-                <button
-                  type="button"
-                  onClick={() => setRole('student')}
-                  className={`flex-1 py-2 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-all ${role === 'student' ? 'bg-white text-primary shadow-sm' : 'text-on-surface-variant hover:bg-slate-100'}`}
-                >
-                  <span className="material-symbols-outlined text-sm">school</span> Student
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('lab_admin')}
-                  className={`flex-1 py-2 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-all ${role === 'lab_admin' ? 'bg-white text-primary shadow-sm' : 'text-on-surface-variant hover:bg-slate-100'}`}
-                >
-                  <span className="material-symbols-outlined text-sm">science</span> Lab Admin
-                </button>
-              </div>
-              <div className="flex gap-1">
-                <button
-                  type="button"
-                  onClick={() => setRole('hod_admin')}
-                  className={`flex-1 py-2 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-all ${role === 'hod_admin' ? 'bg-white text-primary shadow-sm' : 'text-on-surface-variant hover:bg-slate-100'}`}
-                >
-                  <span className="material-symbols-outlined text-sm">badge</span> HOD Admin
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('principal_admin')}
-                  className={`flex-1 py-2 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-all ${role === 'principal_admin' ? 'bg-white text-primary shadow-sm' : 'text-on-surface-variant hover:bg-slate-100'}`}
-                >
-                  <span className="material-symbols-outlined text-sm">account_balance</span> Principal
-                </button>
-              </div>
-            </div>
-
             <form action={formAction} className="space-y-4">
-              <input type="hidden" name="role" value={role} />
-
               {state?.error && (
                 <div className="p-3 bg-rose-50 text-error font-medium rounded-lg text-sm text-center">
                   {state.error}
@@ -100,25 +61,23 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Branch Selection (for Students and HODs) */}
-              {(role === 'student' || role === 'hod_admin') && (
-                <div className="space-y-1 animate-in fade-in slide-in-from-top-2">
-                  <label className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant px-1">Academic Branch</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <span className="material-symbols-outlined text-slate-400 text-lg">account_tree</span>
-                    </div>
-                    <select name="branch" required className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-on-surface focus:border-primary focus:ring-0 outline-none transition-all appearance-none">
-                      <option value="">Select Branch</option>
-                      <option value="CS">Computer Science</option>
-                      <option value="IT">Information Technology</option>
-                      <option value="Mechanical">Mechanical Engineering</option>
-                      <option value="Electrical">Electrical Engineering</option>
-                      <option value="Civil">Civil Engineering</option>
-                    </select>
+              {/* Branch Selection */}
+              <div className="space-y-1 animate-in fade-in slide-in-from-top-2">
+                <label className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant px-1">Academic Branch</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <span className="material-symbols-outlined text-slate-400 text-lg">account_tree</span>
                   </div>
+                  <select name="branch" required className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-on-surface focus:border-primary focus:ring-0 outline-none transition-all appearance-none">
+                    <option value="">Select Branch</option>
+                    <option value="CS">Computer Science</option>
+                    <option value="IT">Information Technology</option>
+                    <option value="Mechanical">Mechanical Engineering</option>
+                    <option value="Electrical">Electrical Engineering</option>
+                    <option value="Civil">Civil Engineering</option>
+                  </select>
                 </div>
-              )}
+              </div>
 
               {/* Submit Button */}
               <button disabled={isPending} className="w-full mt-4 py-3 px-6 bg-primary text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 disabled:opacity-70" type="submit">
