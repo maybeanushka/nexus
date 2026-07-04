@@ -27,7 +27,6 @@ export default function ProfileForm({ user }: { user: any }) {
   return (
     <div className="max-w-4xl mx-auto">
       <form action={formAction} className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <input type="hidden" name="userId" value={user.userId} />
         
         {/* Profile Picture Card */}
         <div className="md:col-span-1">
