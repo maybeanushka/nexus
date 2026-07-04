@@ -1,6 +1,7 @@
 'use server';
 
 import dbConnect from './db';
+import { getSession } from "./auth";
 import { User, Application, DocumentModel, Due, Transaction, AuditLog } from './models';
 import bcrypt from 'bcryptjs';
 import { createSession, destroySession } from './auth';
@@ -270,7 +271,10 @@ export async function processFakePayment(studentId: string) {
 
 export async function updateProfileAction(prevState: any, formData: FormData) {
   await dbConnect();
-  const userId = formData.get('userId') as string;
+  const session = await getSession();
+  if (!session) {
+    return { error: "You must be logged in." };
+  }
   const email = formData.get('email') as string;
   const phone = formData.get('phone') as string;
   const dob = formData.get('dob') as string;
@@ -283,13 +287,16 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
   try {
     let picUrl = '';
     if (profilePicture && profilePicture.size > 0) {
-      picUrl = await uploadToS3(profilePicture, 'profiles');
+      if (!profilePicture.type.startsWith("image/")) {
+        return { error: "Only image files are allowed." };
+      }
+      picUrl = await uploadToS3(profilePicture, "profiles");
     }
 
     const updateData: any = { email, phone, dob };
     if (picUrl) updateData.profile_picture = picUrl;
 
-    await User.findByIdAndUpdate(userId, updateData);
+    await User.findByIdAndUpdate(session.userId, updateData);
     revalidatePath('/', 'layout');
     return { success: true };
   } catch (e: any) {
