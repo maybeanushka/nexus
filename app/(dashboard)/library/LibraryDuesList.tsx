@@ -8,7 +8,7 @@ export default function LibraryDuesList({ dues, studentId }: { dues: any[], stud
 
   const handlePay = async (dueId: string) => {
     setIsProcessing(dueId);
-    const res = await payDuesAction(studentId, dueId);
+    const res = await payDuesAction(dueId);
     if (res.success) {
       window.location.href = `/receipt/${res.transactionId}`;
     }

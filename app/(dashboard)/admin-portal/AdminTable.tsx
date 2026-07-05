@@ -29,7 +29,7 @@ export default function AdminTable({ applications, adminId, adminRole }: { appli
   const handleBulkApprove = () => {
     if (selected.length === 0) return;
     startTransition(async () => {
-      await bulkApprove(selected, adminId, adminRole);
+      await bulkApprove(selected);
       setSelected([]);
       router.refresh();
     });

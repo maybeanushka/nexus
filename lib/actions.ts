@@ -198,8 +198,20 @@ async function sendStudentNotification(studentEmail: string, studentName: string
   }
 }
 
-export async function reviewApplication(applicationId: string, status: 'approved' | 'rejected', notes: string, adminId: string, adminRole: string) {
+export async function reviewApplication(applicationId: string, status: 'approved' | 'rejected', notes: string) {
   await dbConnect();
+  const session = await getSession();
+
+  if (!session) {
+    throw new Error("You must be logged in.");
+  }
+  if (
+    !["lab_admin", "hod_admin", "principal_admin"].includes(session.role)
+  ) {
+    throw new Error("Unauthorized");
+  }
+  const adminId = session.userId;
+  const adminRole = session.role;
   let stageColumn = '';
   let stageName = '';
   
@@ -240,8 +252,18 @@ export async function reviewApplication(applicationId: string, status: 'approved
   return true;
 }
 
-export async function processFakePayment(studentId: string) {
+export async function processFakePayment() {
   await dbConnect();
+  const session = await getSession();
+
+  if (!session) {
+    return { error: "You must be logged in." };
+  }
+  if (session.role !== "student") {
+    return { error: "Unauthorized" };
+  }
+
+  const studentId = session.userId;
   const transId = crypto.randomUUID();
   const qrData = `PAY-${transId.substring(0, 8).toUpperCase()}`;
   
@@ -312,6 +334,15 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
 
 export async function reconcileLibraryDues(csvData: string) {
   await dbConnect();
+  const session = await getSession();
+  if (!session) {
+    throw new Error("You must be logged in.");
+  }
+  if (
+    !["lab_admin", "hod_admin", "principal_admin"].includes(session.role)
+  ) {
+    throw new Error("Unauthorized");
+  }
   const lines = csvData.trim().split('\n');
   const results: any[] = [];
   
@@ -337,8 +368,18 @@ export async function reconcileLibraryDues(csvData: string) {
   return results;
 }
 
-export async function payDuesAction(studentId: string, dueId: string) {
+export async function payDuesAction(dueId: string) {
   await dbConnect();
+  const session = await getSession();
+
+  if (!session) {
+    return { error: "You must be logged in." };
+  }
+  if (session.role !== "student") {
+    return { error: "Unauthorized" };
+  }
+
+  const studentId = session.userId;
   const due = await Due.findById(dueId).lean() as any;
   if (!due || due.status === 'paid') return { error: 'Due already paid or not found' };
 
@@ -357,8 +398,21 @@ export async function payDuesAction(studentId: string, dueId: string) {
   return { success: true, transactionId: trans._id.toString() };
 }
 
-export async function bulkApprove(applicationIds: string[], adminId: string, adminRole: string) {
+export async function bulkApprove(applicationIds: string[]) {
   await dbConnect();
+  const session = await getSession();
+
+  if (!session) {
+    throw new Error("You must be logged in.");
+  }
+  if (
+    !["lab_admin", "hod_admin", "principal_admin"].includes(session.role)
+  ) {
+    throw new Error("Unauthorized");
+  }
+
+  const adminId = session.userId;
+  const adminRole = session.role;
   const stageName = adminRole === 'lab_admin' ? 'Laboratory In-charge' : adminRole === 'hod_admin' ? 'Head of Department' : 'Office of the Principal';
   
   for (const id of applicationIds) {

@@ -12,7 +12,7 @@ export default function PaymentButton({ studentId }: { studentId: string }) {
 
   const handlePayment = () => {
     startTransition(async () => {
-      const res = await processFakePayment(studentId);
+      const res = await processFakePayment();
       if (res.success) {
         setQrData(res.qrData);
         setTransactionId(res.transactionId);

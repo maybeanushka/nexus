@@ -13,7 +13,7 @@ export default function ReviewForm({ applicationId, currentNotes, adminId, admin
     const notes = formData.get('notes') as string;
     startTransition(async () => {
       try {
-        await reviewApplication(applicationId, status, notes, adminId, adminRole);
+        await reviewApplication(applicationId, status, notes);
         setIsSuccess(true);
         // Short delay to show success state before navigating
         setTimeout(() => {
