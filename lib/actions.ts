@@ -81,14 +81,19 @@ export async function logoutAction() {
 
 export async function submitApplication(prevState: any, formData: FormData) {
   await dbConnect();
-  const studentId = formData.get('studentId') as string;
+  const session = await getSession();
+  if (!session) {
+    return { error: "You must be logged in." };
+  }
+  if (session.role !== "student") {
+    return { error: "Only students can submit applications." };
+  }
+  const studentId = session.userId;
   const isResubmission = formData.get('isResubmission') === 'true';
   
   const idCard = formData.get('idCard') as File;
   const libraryReceipt = formData.get('libraryReceipt') as File;
   const labRecords = formData.get('labRecords') as File;
-
-  if (!studentId) return { error: 'Auth error' };
 
   const existing = await Application.findOne({ student_id: studentId }).sort({ submitted_at: -1 }).lean() as any;
   
