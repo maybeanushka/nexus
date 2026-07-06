@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { bulkApprove } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 
-export default function AdminTable({ applications, adminId, adminRole }: { applications: any[], adminId: string, adminRole: string }) {
+export default function AdminTable({ applications, adminRole }: { applications: any[], adminRole: string }) {
   const [selected, setSelected] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();

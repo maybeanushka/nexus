@@ -3,7 +3,7 @@
 import { payDuesAction } from '@/lib/actions';
 import { useState } from 'react';
 
-export default function LibraryDuesList({ dues, studentId }: { dues: any[], studentId: string }) {
+export default function LibraryDuesList({ dues }: { dues: any[] }) {
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   const handlePay = async (dueId: string) => {

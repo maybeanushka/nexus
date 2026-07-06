@@ -78,7 +78,7 @@ export default async function AdminPortal() {
           Pending Applications
         </h3>
         
-        <AdminTable applications={pendingApplications} adminId={session.userId} adminRole={session.role} />
+        <AdminTable applications={pendingApplications} adminRole={session.role} />
       </div>
     </>
   );

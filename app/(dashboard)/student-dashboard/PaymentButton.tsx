@@ -5,7 +5,7 @@ import { processFakePayment } from '@/lib/actions';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 
-export default function PaymentButton({ studentId }: { studentId: string }) {
+export default function PaymentButton() {
   const [isPending, startTransition] = useTransition();
   const [qrData, setQrData] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
