@@ -3,7 +3,7 @@
 import { useActionState, useState } from 'react';
 import { submitApplication } from '@/lib/actions';
 
-export default function SubmitForm({ studentId, isResubmission }: { studentId: string; isResubmission?: boolean }) {
+export default function SubmitForm({ isResubmission }: { isResubmission?: boolean }) {
   const [state, formAction, isPending] = useActionState(submitApplication, null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -52,7 +52,6 @@ export default function SubmitForm({ studentId, isResubmission }: { studentId: s
       </div>
       
       <form action={formAction} className="space-y-6">
-        <input type="hidden" name="studentId" value={studentId} />
         <input type="hidden" name="isResubmission" value={isResubmission ? 'true' : 'false'} />
         
         {state?.error && (

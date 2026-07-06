@@ -208,7 +208,7 @@ export default async function StudentDashboard() {
                 <p className="text-sm text-slate-600 mb-6">Your clearance is approved. Please pay the processing fee to generate your certificate.</p>
 
                 {!transaction ? (
-                  <PaymentButton studentId={session.userId} />
+                  <PaymentButton />
                 ) : (
                   <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-teal-100">
                     <div className="flex items-center gap-3">

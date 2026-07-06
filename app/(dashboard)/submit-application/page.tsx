@@ -35,7 +35,7 @@ export default async function SubmitApplicationPage() {
             </Link>
           </div>
         ) : (
-          <SubmitForm studentId={session.userId} isResubmission={existing?.overall_status === 'rejected'} />
+          <SubmitForm isResubmission={existing?.overall_status === 'rejected'} />
         )}
       </section>
     );

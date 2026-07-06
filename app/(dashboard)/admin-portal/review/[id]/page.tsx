@@ -81,7 +81,7 @@ export default async function ReviewApplicationPage({ params }: { params: { id: 
             Administrative Decision
           </h3>
           <p className="text-sm text-slate-500 mb-6 leading-relaxed">Please verify the uploaded documents above before rendering a decision. Once submitted, the protocol will advance to the next authority.</p>
-          <ReviewForm applicationId={app._id.toString()} currentNotes="" adminId={session.userId} adminRole={session.role} />
+          <ReviewForm applicationId={app._id.toString()} currentNotes="" />
         </div>
       </div>
     </>

@@ -4,7 +4,7 @@ import { reviewApplication } from '@/lib/actions';
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function ReviewForm({ applicationId, currentNotes, adminId, adminRole }: { applicationId: string, currentNotes: string, adminId: string, adminRole: string }) {
+export default function ReviewForm({ applicationId, currentNotes }: { applicationId: string, currentNotes: string }) {
   const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
