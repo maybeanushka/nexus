@@ -68,7 +68,7 @@ export default async function StudentDashboard() {
       {!application ? (
         <Link
           href="/submit-application"
-          className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-white font-semibold shadow hover:scale-[1.02] transition">
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-white font-semibold shadow-xl hover:scale-[1.02] transition">
           <span className="material-symbols-outlined">
             add_circle
           </span>
@@ -112,24 +112,28 @@ export default async function StudentDashboard() {
       )}
     </section>
     <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 xl:grid-cols-4">
-      <div className="rounded-2xl border bg-white p-5 shadow-sm">
-        <p className="text-xs uppercase tracking-widest text-slate-500">Application</p>
-        <h3 className="mt-2 text-2xl font-bold">{application ? "Submitted" : "Not Started"}</h3>
-    </div>
+      <div className="rounded-2xl border border-blue-100 bg-blue-50 p-6 shadow-sm">
+      <span className="material-symbols-outlined text-3xl text-blue-600">description</span>
+        <p className="text-xs font-semibold uppercase tracking-widest text-blue-500">Application</p>
+        <h3 className="mt-2 text-2xl font-bold text-slate-900">{application ? "Submitted" : "Not Started"}</h3>
+      </div>
 
-    <div className="rounded-2xl border bg-white p-5 shadow-sm">
-        <p className="text-xs uppercase tracking-widest text-slate-500">Progress</p>
-        <h3 className="mt-2 text-2xl font-bold text-primary">{completionPercentage}%</h3>
-    </div>
+      <div className="rounded-2xl border-emerald-100 bg-emerald-50 p-6 shadow-sm">
+          <span className="material-symbols-outlined text-3xl text-emerald-600">monitoring</span>
+          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-500">Progress</p>
+          <h3 className="mt-2 text-2xl font-bold text-slade-900">{completionPercentage}%</h3>
+      </div>
 
-    <div className="rounded-2xl border bg-white p-5 shadow-sm">
-        <p className="text-xs uppercase tracking-widest text-slate-500">Payments</p>
-        <h3 className="mt-2 text-2xl font-bold">{transaction ? "Paid" : "Pending"}</h3>
-    </div>
+      <div className="rounded-2xl border border-amber-100 bg-amber-50 p-6 shadow-sm">
+          <span className="material-symbols-outlined text-3xl text-amber-600">payments</span>
+          <p className="text-xs uppercase font-semibold tracking-widest text-amber-500">Payments</p>
+          <h3 className="mt-2 text-2xl font-bold text-slade-900">{transaction ? "Paid" : "Pending"}</h3>
+      </div>
 
-    <div className="rounded-2xl border bg-white p-5 shadow-sm">
-        <p className="text-xs uppercase tracking-widest text-slate-500">Certificate</p>
-        <h3 className="mt-2 text-2xl font-bold">{application?.overall_status === "approved" ? "Available" : "Locked"}</h3>
+      <div className="rounded-2xl border border-violet-100 bg-violet-50 p-6 shadow-sm">
+          <span className="material-symbols-outlined text-3xl text-violet-600">workspace_premium</span>
+          <p className="text-xs uppercase font-semibold tracking-widest text-violet-500">Certificate</p>
+          <h3 className="mt-2 text-2xl font-bold text-slate-900">{application?.overall_status === "approved" ? "Available" : "Locked"}</h3>
       </div>
     </div>
 
@@ -318,7 +322,7 @@ export default async function StudentDashboard() {
                 </div>
               ))
             ) : (
-              <div className="text-sm text-on-surface-variant relative z-10 pl-10">No updates logged yet.</div>
+              <div className="text-sm text-on-surface-variant relative z-10 pl-10">No updates logged yet.<br></br>Latest activities will appear here.</div>
             )}
           </div>
         </div>
