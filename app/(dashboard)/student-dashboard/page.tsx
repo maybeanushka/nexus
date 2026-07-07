@@ -50,65 +50,88 @@ export default async function StudentDashboard() {
 
   return (
     <>
-      {/* Welcome Hero Section */}
-      <section className="mb-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-        <div>
-          <h2 className="text-4xl font-black tracking-tight text-on-surface mb-2">Welcome back, {session.name}.</h2>
-          <p className="text-on-surface-variant text-lg">
-            {application
-              ? `Your application status is ${application.overall_status.toUpperCase()}.`
-              : "You have not applied for clearance yet."}
-          </p>
-        </div>
-        {!application ? (
-          <Link href="/submit-application" className="bg-primary hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold tracking-wide shadow-lg shadow-primary/20 transition-all flex items-center gap-3 group shrink-0">
-            <span>Apply for Clearance</span>
-            <span className="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
-          </Link>
-        ) : (
-          <div className="flex gap-6 bg-white px-6 py-4 rounded-xl border border-slate-100 shadow-sm shrink-0 items-center">
-            <div className="flex flex-col">
-              <p className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-1 text-center">Completion</p>
-              <div className="relative w-16 h-16 flex items-center justify-center">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle
-                    cx="32"
-                    cy="32"
-                    r="28"
-                    stroke="currentColor"
-                    strokeWidth="6"
-                    fill="transparent"
-                    className="text-slate-100"
-                  />
-                  <circle
-                    cx="32"
-                    cy="32"
-                    r="28"
-                    stroke="currentColor"
-                    strokeWidth="6"
-                    fill="transparent"
-                    strokeDasharray={175.9}
-                    strokeDashoffset={175.9 - (175.9 * completionPercentage) / 100}
-                    className="text-primary transition-all duration-1000 ease-out"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <span className="absolute text-sm font-black text-slate-800">{completionPercentage}%</span>
-              </div>
-            </div>
-            <div className="w-[1px] h-10 bg-slate-100"></div>
-            <div>
-              <p className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-1">Queue Size</p>
-              <p className="text-xl font-black text-slate-800">{queueSize.count}</p>
-            </div>
-            <div className="w-[1px] h-10 bg-slate-100"></div>
-            <div>
-              <p className="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-1">Est. Completion</p>
-              <p className="text-xl font-black text-slate-800">{expectedCompletionMins > 0 ? `${Math.floor(expectedCompletionMins / 60)}h ${expectedCompletionMins % 60}m` : '< 1m'}</p>
-            </div>
+    {/* Welcome Hero Section */}
+    <section className="mb-8 flex flex-col lg:flex-row justify-between lg:items-center gap-6">
+      <div className="space-y-3">
+        <p className="text-sm font-semibold text-primary uppercase tracking-widest">
+          Student Dashboard
+        </p>
+        <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-slate-900">
+          Welcome back, {session.name} 👋
+        </h1>
+        <p className="text-base text-slate-500 max-w-2xl leading-relaxed">
+          Track your graduation clearance, monitor approvals,
+          manage payments and download your clearance certificate
+          from one place.
+        </p>
+      </div>
+      {!application ? (
+        <Link
+          href="/submit-application"
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-white font-semibold shadow hover:scale-[1.02] transition">
+          <span className="material-symbols-outlined">
+            add_circle
+          </span>
+          Apply Now →
+        </Link>
+      ) : (
+        <div className="grid grid-cols-3 gap-4">
+          <div className="rounded-xl border bg-white p-5 text-center shadow-sm">
+            <p className="text-xs uppercase tracking-widest text-slate-500">
+              Progress
+            </p>
+            <p className="mt-2 text-3xl font-bold text-primary">
+              {completionPercentage}%
+            </p>
           </div>
-        )}
-      </section>
+          <div className="rounded-xl border bg-white p-5 text-center shadow-sm">
+            <p className="text-xs uppercase tracking-widest text-slate-500">
+              Status
+            </p>
+            <p className="mt-2 text-lg font-semibold capitalize">
+              {application.overall_status}
+            </p>
+          </div>
+          <div className="rounded-xl border bg-white p-5 text-center shadow-sm">
+            <p className="text-xs uppercase tracking-widest text-slate-500">
+              Stage
+            </p>
+            <p className="mt-2 text-lg font-semibold">
+              {
+                application.principal_status === "approved"
+                  ? "Completed"
+                  : application.hod_status === "approved"
+                  ? "Principal"
+                  : application.lab_status === "approved"
+                  ? "HOD"
+                  : "Laboratory"
+              }
+            </p>
+          </div>
+        </div>
+      )}
+    </section>
+    <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <p className="text-xs uppercase tracking-widest text-slate-500">Application</p>
+        <h3 className="mt-2 text-2xl font-bold">{application ? "Submitted" : "Not Started"}</h3>
+    </div>
+
+    <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <p className="text-xs uppercase tracking-widest text-slate-500">Progress</p>
+        <h3 className="mt-2 text-2xl font-bold text-primary">{completionPercentage}%</h3>
+    </div>
+
+    <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <p className="text-xs uppercase tracking-widest text-slate-500">Payments</p>
+        <h3 className="mt-2 text-2xl font-bold">{transaction ? "Paid" : "Pending"}</h3>
+    </div>
+
+    <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <p className="text-xs uppercase tracking-widest text-slate-500">Certificate</p>
+        <h3 className="mt-2 text-2xl font-bold">{application?.overall_status === "approved" ? "Available" : "Locked"}</h3>
+      </div>
+    </div>
 
       <div className="grid grid-cols-12 gap-8">
         {/* Status Tracker Heatmap */}
@@ -116,7 +139,7 @@ export default async function StudentDashboard() {
           <div className="flex justify-between items-center mb-10">
             <h3 className="text-xl font-bold flex items-center gap-2">
               <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>analytics</span>
-              Clearance Status Protocol
+              Application Status
             </h3>
             <div className="flex items-center gap-4">
               {application && <DownloadDocsButton documents={documents} studentName={session.name} />}
@@ -174,11 +197,46 @@ export default async function StudentDashboard() {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-outline-variant rounded-xl">
-              <span className="material-symbols-outlined text-4xl text-outline mb-4">folder_off</span>
-              <h4 className="text-lg font-bold text-on-surface mb-2">No Application Found</h4>
-              <p className="text-on-surface-variant text-sm max-w-sm mb-6">You haven't started your clearance process yet. Apply now to get your clearance certificate.</p>
-              <Link href="/submit-application" className="text-primary font-bold hover:underline">Apply Now</Link>
+            <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-10 text-center shadow-sm">
+              <span className="material-symbols-outlined text-6xl text-primary">description</span>
+
+              <h3 className="mt-5 text-3xl font-bold text-slate-900">
+                Start Your Clearance Journey
+              </h3>
+
+              <p className="mx-auto mt-3 max-w-xl text-base text-slate-500">
+                Submit your documents once and track every approval from your laboratory, department and principal's office in one place.
+              </p>
+
+              <div className="mx-auto mt-8 grid max-w-md gap-4 text-left">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary">check_circle</span>
+                  Upload required documents
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary">check_circle</span>
+                  Department verification
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary">check_circle</span>
+                  Pay pending dues
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary">check_circle</span>
+                  Download digital certificate
+                </div>
+              </div>
+
+              <Link
+                href="/submit-application"
+                className="mt-8 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white shadow transition hover:scale-[1.02]"
+              >
+                <span className="material-symbols-outlined">arrow_forward</span>
+                Start Application
+              </Link>
             </div>
           )}
 
@@ -232,7 +290,7 @@ export default async function StudentDashboard() {
         <div className="col-span-12 lg:col-span-4 aether-card rounded-2xl p-8">
           <h3 className="text-xl font-bold mb-8 flex items-center gap-2">
             <span className="material-symbols-outlined text-primary">campaign</span>
-            Protocol Updates
+            Latest Updates
           </h3>
           <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
             {auditLogs.length > 0 ? (
