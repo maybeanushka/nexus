@@ -20,8 +20,11 @@ export default async function SubmitApplicationPage() {
 
     return (
       <section>
-        <div className="mb-10">
-          <h2 className="text-4xl font-black tracking-tight text-on-surface mb-2">Protocol Initiation</h2>
+        <div className="mb-5">
+          <h2 className="text-3xl font-black tracking-tight text-on-surface">Application Submission</h2>
+          <p className="mt-1 text-slate-500">
+            Upload the required documents to begin your graduation clearance process.
+          </p>
         </div>
         {existing && existing.overall_status !== 'rejected' ? (
           <div className="max-w-2xl mx-auto flex flex-col items-center justify-center p-12 text-center aether-card rounded-2xl min-h-[50vh]">
