@@ -14,7 +14,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="bg-background text-on-surface font-body min-h-screen">
       <Sidebar user={session} />
       <TopNav user={session} />
-      <main className="ml-64 pt-24 px-10 pb-12 min-h-screen">
+      <main className="ml-64 pt-22 px-10 pb-8 min-h-screen">
         {children}
       </main>
       <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-outline-variant flex justify-around items-center px-4 z-50">

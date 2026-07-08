@@ -296,8 +296,13 @@ export default async function StudentDashboard() {
             <span className="material-symbols-outlined text-primary">campaign</span>
             Latest Updates
           </h3>
-          <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
-            {auditLogs.length > 0 ? (
+          <div
+            className={`space-y-6 relative ${
+              auditLogs.length > 0
+                ? "before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent"
+                : ""
+            }`}>
+                {auditLogs.length > 0 ? (
               auditLogs.map((log: any, index: number) => (
                 <div key={log._id.toString()} className="relative flex items-start gap-4">
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 z-10 ${log.action.includes('rejected') ? 'bg-rose-100 text-rose-600' :

@@ -1,12 +1,37 @@
+'use client';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function TopNav({ user }: { user: any }) {
+  const pathname = usePathname();
+  const titles: Record<string, string> = {
+    '/student-dashboard': 'Dashboard',
+    '/submit-application': 'Apply for Clearance',
+    '/library': 'Library',
+    '/fees': 'Payments',
+    '/certificate': 'Clearance Certificate',
+    '/profile': 'Student Profile',
+    '/admin-portal': 'Admin Portal',
+    '/admin/library': 'Library Admin',
+  };
+  const pageTitle = titles[pathname] || 'Nexus';
   return (
     <header className="fixed top-0 right-0 left-64 h-16 bg-white/80 backdrop-blur-md z-30 border-b border-outline-variant/50 flex justify-between items-center px-8">
-      <div className="flex items-center gap-4">
-        <h1 className="text-2xl font-black tracking-tighter text-primary">Dashboard</h1>
-        <div className="h-4 w-[1px] bg-outline-variant mx-2"></div>
-        <span className="text-on-surface-variant font-medium text-sm">Graduation Clearance Portal</span>
+      <div className="flex flex-col">
+        <p className="text-xs font-medium text-primary uppercase tracking-wider">
+          Home
+          <span className="mx-2 text-slate-300">/</span>
+          <span className="text-slate-700">{pageTitle}</span>
+        </p>
+
+        <p className="text-sm text-primary mt-1">
+          {new Date().toLocaleDateString('en-IN', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })}
+        </p>
       </div>
       <div className="flex items-center gap-6">
 
