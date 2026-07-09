@@ -10,6 +10,26 @@ export default async function LibraryPage() {
 
   await dbConnect();
   const dues = await Due.find({ student_id: session.userId, type: 'library' }).lean() as any[];
+  const pendingBooks = dues.flatMap(d => d.books || []);
+  const nextDueBook =
+    pendingBooks.length > 0
+      ? pendingBooks.sort(
+          (a, b) =>
+            new Date(a.due_date).getTime() -
+            new Date(b.due_date).getTime()
+        )[0]
+      : null;
+  let daysRemaining = 0;
+  if (nextDueBook) {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const due = new Date(nextDueBook.due_date);
+    due.setHours(0,0,0,0);
+    daysRemaining = Math.ceil(
+      (due.getTime() - today.getTime()) /
+      (1000 * 60 * 60 * 24)
+    );
+  }
   const totalFine = dues
   .filter(due => due.status === 'pending')
   .reduce((sum, due) => sum + due.amount, 0);
@@ -130,11 +150,79 @@ export default async function LibraryPage() {
 
       </div>
         
-        <div className="space-y-6">
-          <div className="space-y-6">
+        <div className="space-y-3">
+            <div className="aether-card rounded-2xl p-3 mb-3">
+              <h3 className="text-base font-bold flex items-center gap-2 text-primary">
+                <span className="material-symbols-outlined text-primary">
+                  schedule
+                </span>
+                Next Due Date
+              </h3>
+              {nextDueBook ? (
+                <>
+                  <p
+                    className={`mt-2 text-xl px-22 font-black ${
+                      daysRemaining < 3
+                        ? 'text-rose-600'
+                        : daysRemaining <= 7
+                        ? 'text-amber-500'
+                        : 'text-teal-600'
+                    }`}
+                  >
+                    {new Intl.DateTimeFormat('en-GB',{
+                      day:'2-digit',
+                      month:'short',
+                      year:'numeric'
+                    }).format(new Date(nextDueBook.due_date))}
+                  </p>
+                  <div className="text-center">
+                    <p className="font-bold text-base text-slate-900">
+                      {nextDueBook.title}
+                    </p>
 
+                    <p className="text-[15px] text-slate-500">
+                      {nextDueBook.author}
+                    </p>
+                  </div>
+                  <div className="mt-4">
+                    {daysRemaining >= 0 ? (
+                      <span
+                        className={`inline-flex rounded-full px-3 py-1 text-sm font-bold ${
+                          daysRemaining < 3
+                            ? 'bg-rose-100 text-rose-700'
+                            : daysRemaining <= 7
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-teal-100 text-teal-700'
+                        }`}
+                      >
+                        {daysRemaining} day{daysRemaining !== 1 ? 's' : ''} remaining
+                      </span>
+                    ) : (
+                      <span className="inline-flex rounded-full bg-rose-100 text-rose-700 px-3 py-1 text-sm font-bold">
+                        {Math.abs(daysRemaining)} day{Math.abs(daysRemaining) !== 1 ? 's' : ''} overdue
+                      </span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <div className="flex items-center gap-3 text-teal-600 mb-4">
+                    <span className="material-symbols-outlined text-4xl">
+                      check_circle
+                    </span>
+                    <div>
+                      <p className="font-bold text-lg">
+                        No Upcoming Due Dates
+                      </p>
+                      <p className="text-slate-500 text-sm">
+                        All library books have been returned.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
             <div className="aether-card rounded-2xl p-6">
-
               <div className="flex items-center gap-2 mb-5">
                 <span className="material-symbols-outlined text-primary">
                   info
@@ -143,59 +231,47 @@ export default async function LibraryPage() {
                   Library Guidelines
                 </h3>
               </div>
-
               <div className="space-y-4">
-
                 <div className="flex gap-3">
                   <span className="material-symbols-outlined text-emerald-500">
                     check_circle
                   </span>
-
                   <div>
                     <p className="font-semibold">
                       Return borrowed books
                     </p>
-
                     <p className="text-sm text-slate-500">
                       All issued books must be returned before clearance.
                     </p>
                   </div>
                 </div>
-
                 <div className="flex gap-3">
                   <span className="material-symbols-outlined text-emerald-500">
                     payments
                   </span>
-
                   <div>
                     <p className="font-semibold">
                       Clear pending fines
                     </p>
-
                     <p className="text-sm text-slate-500">
                       Outstanding dues must be paid before approval.
                     </p>
                   </div>
                 </div>
-
                 <div className="flex gap-3">
                   <span className="material-symbols-outlined text-emerald-500">
                     verified
                   </span>
-
                   <div>
                     <p className="font-semibold">
                       Library verification
                     </p>
-
                     <p className="text-sm text-slate-500">
                       Your application proceeds automatically once dues are cleared.
                     </p>
                   </div>
                 </div>
-
               </div>
-
             </div>
             <div className="aether-card rounded-2xl p-8">
               <h3 className="text-xl font-bold flex items-center gap-2 mb-5">
@@ -204,9 +280,7 @@ export default async function LibraryPage() {
                 </span>
                 Library Contact
               </h3>
-
               <div className="space-y-3 text-sm">
-
                 <div className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary">
                     person
@@ -218,7 +292,6 @@ export default async function LibraryPage() {
                     </p>
                   </div>
                 </div>
-
                 <div className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary">
                     call
@@ -230,7 +303,6 @@ export default async function LibraryPage() {
                     </p>
                   </div>
                 </div>
-
                 <div className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary">
                     mail
@@ -242,7 +314,6 @@ export default async function LibraryPage() {
                     </p>
                   </div>
                 </div>
-
                 <div className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-primary">
                     schedule
@@ -254,11 +325,8 @@ export default async function LibraryPage() {
                     </p>
                   </div>
                 </div>
-
               </div>
             </div>
-
-          </div>
         </div>
       </div>
     </section>
