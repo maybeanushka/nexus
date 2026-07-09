@@ -47,6 +47,17 @@ const dueSchema = new Schema({
   type: { type: String, required: true, enum: ['library', 'other'] },
   amount: { type: Number, required: true },
   details: String,
+  pending_books: {
+    type: Number,
+    default: 0
+  },
+  books: [
+    {
+      title: String,
+      author: String,
+      due_date: Date
+    }
+  ],
   status: { type: String, default: 'pending', enum: ['pending', 'paid'] },
   transaction_id: String,
   created_at: { type: Date, default: Date.now }

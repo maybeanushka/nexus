@@ -358,7 +358,32 @@ export async function reconcileLibraryDues(csvData: string) {
       student_id: studentId,
       type: 'library',
       amount: fine,
-      details: `Pending Books: ${books}`,
+
+      details: `${books} pending book${books === 1 ? '' : 's'}`,
+
+      pending_books: books,
+
+      books:
+        books > 0
+          ? [
+              {
+                title: 'Database Management Systems',
+                author: 'Raghu Ramakrishnan',
+                due_date: new Date('2026-07-15')
+              },
+              {
+                title: 'Operating System Concepts',
+                author: 'Silberschatz',
+                due_date: new Date('2026-07-18')
+              },
+              {
+                title: 'Computer Networks',
+                author: 'Kurose',
+                due_date: new Date('2026-07-20')
+              }
+            ].slice(0, books)
+          : [],
+
       status: fine > 0 || books > 0 ? 'pending' : 'paid'
     });
     
