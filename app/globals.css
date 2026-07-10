@@ -41,3 +41,19 @@
     text-transform: uppercase;
   }
 }
+
+@keyframes roleFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-roleFade {
+  animation: roleFade 220ms ease;
+}
