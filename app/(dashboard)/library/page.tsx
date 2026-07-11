@@ -9,8 +9,21 @@ export default async function LibraryPage() {
   if (!session) redirect('/login');
 
   await dbConnect();
-  const dues = await Due.find({ student_id: session.userId, type: 'library' }).lean() as any[];
-  const pendingBooks = dues.flatMap(d => d.books || []);
+  const pendingDues = await Due.find({
+  student_id: session.userId,
+  type: 'library',
+  status: 'pending'
+}).lean() as any[];
+
+const paidDues = await Due.find({
+  student_id: session.userId,
+  type: 'library',
+  status: 'paid'
+})
+.sort({ updatedAt: -1 })
+.lean() as any[];
+
+  const pendingBooks = pendingDues.flatMap(d => d.books || []);
   const nextDueBook =
     pendingBooks.length > 0
       ? pendingBooks.sort(
@@ -30,7 +43,7 @@ export default async function LibraryPage() {
       (1000 * 60 * 60 * 24)
     );
   }
-  const totalFine = dues
+  const totalFine = pendingDues
   .filter(due => due.status === 'pending')
   .reduce((sum, due) => sum + due.amount, 0);
 
@@ -43,7 +56,7 @@ export default async function LibraryPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <LibraryDuesList dues={dues} />
+          <LibraryDuesList dues={pendingDues} />
           <div className="grid md:grid-cols-2 gap-6">
               {
                 <div className="aether-card rounded-2xl p-6">
@@ -63,12 +76,12 @@ export default async function LibraryPage() {
                     </div>
                     <span
                       className={`material-symbols-outlined ${
-                        dues.some(d => d.books?.length)
+                        pendingDues.some(d => d.books?.length)
                           ? 'text-amber-500'
                           : 'text-emerald-500'
                       }`}
                     >
-                      {dues.some(d => d.books?.length)
+                      {pendingDues.some(d => d.books?.length)
                         ? 'pending'
                         : 'check_circle'}
                     </span>
@@ -82,12 +95,12 @@ export default async function LibraryPage() {
                     </div>
                     <span
                       className={`material-symbols-outlined ${
-                        dues.some(d => d.status === 'pending')
+                        pendingDues.some(d => d.status === 'pending')
                           ? 'text-amber-500'
                           : 'text-emerald-500'
                       }`}
                     >
-                      {dues.some(d => d.status === 'pending')
+                      {pendingDues.some(d => d.status === 'pending')
                         ? 'pending'
                         : 'check_circle'}
                     </span>
@@ -114,11 +127,9 @@ export default async function LibraryPage() {
                       </span>
                       Recent Payment
                   </h3>
-                  {dues.some(d=>d.status==="paid") ? (
+                  {paidDues.length > 0 ? (
                       <div className="space-y-3">
-                          {dues
-                              .filter(d=>d.status==="paid")
-                              .slice(0,1)
+                          {paidDues.slice(0,1)
                               .map(d=>(
                                   <div key={d._id}>
                                       <p className="font-bold">
@@ -206,7 +217,7 @@ export default async function LibraryPage() {
                 </>
               ) : (
                 <div>
-                  <div className="flex items-center gap-3 text-teal-600 mb-4">
+                  <div className="flex items-center gap-3 text-teal-600 mt-4 mb-4">
                     <span className="material-symbols-outlined text-4xl">
                       check_circle
                     </span>
