@@ -27,7 +27,7 @@ export default async function SubmitApplicationPage() {
           </p>
         </div>
         {existing && existing.overall_status !== 'rejected' ? (
-          <div className="max-w-2xl mx-auto flex flex-col items-center justify-center p-12 text-center aether-card rounded-2xl min-h-[50vh]">
+          <div className="max-w-2xl mx-auto flex flex-col items-center justify-center p-12 text-center aether-card rounded-2xl min-h-[50vh] mt-10">
             <span className="material-symbols-outlined text-6xl text-primary mb-4">task_alt</span>
             <h4 className="text-2xl font-black text-on-surface mb-2">Application Already Submitted</h4>
             <p className="text-on-surface-variant text-sm max-w-sm mb-6">

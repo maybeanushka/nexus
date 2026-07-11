@@ -56,7 +56,7 @@ export default async function StudentDashboard() {
         <p className="text-sm font-semibold text-primary uppercase tracking-widest">
           Student Dashboard
         </p>
-        <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-slate-900">
+        <h1 className="text-4xl lg:text-5xl font-black tracking-tight">
           Welcome back, {session.name} 👋
         </h1>
         <p className="text-base text-slate-500 max-w-2xl leading-relaxed">
@@ -75,39 +75,7 @@ export default async function StudentDashboard() {
           Apply Now →
         </Link>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
-          <div className="rounded-xl border bg-white p-5 text-center shadow-sm">
-            <p className="text-xs uppercase tracking-widest text-slate-500">
-              Progress
-            </p>
-            <p className="mt-2 text-3xl font-bold text-primary">
-              {completionPercentage}%
-            </p>
-          </div>
-          <div className="rounded-xl border bg-white p-5 text-center shadow-sm">
-            <p className="text-xs uppercase tracking-widest text-slate-500">
-              Status
-            </p>
-            <p className="mt-2 text-lg font-semibold capitalize">
-              {application.overall_status}
-            </p>
-          </div>
-          <div className="rounded-xl border bg-white p-5 text-center shadow-sm">
-            <p className="text-xs uppercase tracking-widest text-slate-500">
-              Stage
-            </p>
-            <p className="mt-2 text-lg font-semibold">
-              {
-                application.principal_status === "approved"
-                  ? "Completed"
-                  : application.hod_status === "approved"
-                  ? "Principal"
-                  : application.lab_status === "approved"
-                  ? "HOD"
-                  : "Laboratory"
-              }
-            </p>
-          </div>
+        <div className="grid grid-cols-2 gap-4">
         </div>
       )}
     </section>
@@ -139,10 +107,10 @@ export default async function StudentDashboard() {
 
       <div className="grid grid-cols-12 gap-8">
         {/* Status Tracker Heatmap */}
-        <div className="col-span-12 lg:col-span-8 aether-card rounded-2xl p-8">
-          <div className="flex justify-between items-center mb-10">
+        <div className="col-span-12 lg:col-span-8 aether-card rounded-2xl !bg-primary p-7 text-white shadow-xl">
+          <div className="flex justify-between bg-primary items-center mb-10">
             <h3 className="text-xl font-bold flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>analytics</span>
+              <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>analytics</span>
               Application Status
             </h3>
             <div className="flex items-center gap-4">
@@ -157,9 +125,6 @@ export default async function StudentDashboard() {
 
           {application ? (
             <div className="relative flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4 px-4 py-8 bg-slate-50/50 rounded-3xl border border-slate-100">
-              {/* Progress Line */}
-              <div className="absolute top-1/2 left-0 w-full h-1 bg-slate-200/50 -translate-y-1/2 hidden md:block z-0"></div>
-              
               {[
                 { id: 'docs', label: 'Documents Submission', status: 'approved', icon: 'cloud_done' },
                 { id: 'lab', label: 'Laboratory In-charge', status: application.lab_status, icon: 'verified' },
@@ -169,9 +134,9 @@ export default async function StudentDashboard() {
                 <div key={stage.id} className="relative z-10 flex flex-col items-center group w-full max-w-[160px]">
                   <div className={`
                     w-16 h-16 md:w-20 md:h-20 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center shadow-xl transition-all duration-500 border-4 border-white
-                    ${stage.status === 'approved' ? 'bg-teal-500 text-white scale-110 shadow-lg shadow-teal-200' : 
-                      stage.status === 'rejected' ? 'bg-rose-500 text-white animate-pulse shadow-lg shadow-rose-200' : 
-                      'bg-amber-400 text-white shadow-lg shadow-amber-100'}
+                    ${stage.status === 'approved' ? 'bg-teal-500 text-white scale-110 shadow-sm shadow-teal-200 mb-3' : 
+                      stage.status === 'rejected' ? 'bg-rose-500 text-white animate-pulse shadow-sm shadow-rose-200 mb-3' : 
+                      'bg-amber-400 text-white shadow-sm shadow-amber-100 mb-3'}
                   `}>
                     <span className="material-symbols-outlined text-2xl md:text-3xl">
                       {stage.status === 'approved' ? (stage.icon || 'verified') : stage.status === 'rejected' ? 'error' : 'hourglass_bottom'}
@@ -201,7 +166,7 @@ export default async function StudentDashboard() {
               ))}
             </div>
           ) : (
-            <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-10 text-center shadow-sm">
+            <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white/80 p-8 text-center shadow-sm">
               <span className="material-symbols-outlined text-6xl text-primary">description</span>
 
               <h3 className="mt-5 text-3xl font-bold text-slate-900">
@@ -213,22 +178,22 @@ export default async function StudentDashboard() {
               </p>
 
               <div className="mx-auto mt-8 grid max-w-md gap-4 text-left">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 text-primary">
                   <span className="material-symbols-outlined text-primary">check_circle</span>
                   Upload required documents
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 text-primary">
                   <span className="material-symbols-outlined text-primary">check_circle</span>
                   Department verification
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 text-primary">
                   <span className="material-symbols-outlined text-primary">check_circle</span>
                   Pay pending dues
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 text-primary">
                   <span className="material-symbols-outlined text-primary">check_circle</span>
                   Download digital certificate
                 </div>
@@ -256,7 +221,7 @@ export default async function StudentDashboard() {
                     <p className="text-sm text-rose-700 mt-1 max-w-md">Your application was rejected at a specific stage. Review the remarks below, update your documents, and resubmit to resume the process from the checkpoint.</p>
                   </div>
                 </div>
-                <Link href="/submit-application" className="bg-rose-600 hover:bg-rose-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-rose-200 transition-all shrink-0">
+                <Link href="/submit-application" className="bg-rose-600 hover:bg-rose-700 text-white px-8 py-3 rounded-xl font-bold shadow-sm shadow-rose-200 transition-all shrink-0">
                   Update & Resubmit
                 </Link>
               </div>
