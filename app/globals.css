@@ -57,3 +57,72 @@
 .animate-roleFade {
   animation: roleFade 220ms ease;
 }
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+
+  html,
+  body {
+    width: 210mm;
+    height: 297mm;
+    background: white !important;
+    overflow: hidden;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #receipt,
+  #receipt * {
+    visibility: visible;
+  }
+
+  #receipt {
+    position: fixed;
+    left: 0;
+    top: 0;
+
+    width: 210mm;
+    height: 297mm;
+
+    padding: 18mm;
+
+    box-sizing: border-box;
+
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    background: white;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  table,
+  tr,
+  td,
+  svg,
+  img {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  nav,
+  aside,
+  header,
+  footer,
+  main > *:not(#receipt) {
+    display: none !important;
+  }
+}
