@@ -30,13 +30,85 @@ export default async function CertificatePage() {
 
   if (!application || !transaction) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center bg-white border border-slate-100 shadow-sm rounded-3xl min-h-[50vh]">
-        <span className="material-symbols-outlined text-6xl text-rose-500 mb-4">cancel</span>
-        <h4 className="text-2xl font-black text-on-surface mb-2">Certificate Unavailable</h4>
-        <p className="text-on-surface-variant text-sm max-w-sm mb-6">
-          {!application ? 'Your clearance protocol must be fully approved by the administration.' : 'You must pay the clearance processing fee before a certificate can be generated.'}
+      <div className="aether-card rounded-3xl p-12 max-w-3xl mx-auto text-center mt-5">
+
+        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-amber-100">
+          <span className="material-symbols-outlined text-5xl text-amber-600">
+            lock
+          </span>
+        </div>
+
+        <h2 className="mt-6 text-3xl font-black">
+          Certificate Locked
+        </h2>
+
+        <p className="mt-3 text-slate-500 max-w-lg mx-auto">
+          Complete all graduation clearance requirements to unlock your
+          official clearance certificate.
         </p>
-        <Link href="/student-dashboard" className="text-primary font-bold hover:underline">Return to Dashboard</Link>
+
+        <div className="mt-10 rounded-2xl border border-slate-200 p-6 text-left">
+
+          <h3 className="font-bold mb-5">
+            Clearance Checklist
+          </h3>
+
+          <div className="space-y-5">
+
+            <div className="flex items-center justify-between">
+              <span>Administrative Approval</span>
+
+              {application ? (
+                <span className="flex items-center gap-2 text-emerald-600 font-semibold">
+                  <span className="material-symbols-outlined">
+                    check_circle
+                  </span>
+                  Approved
+                </span>
+              ) : (
+                <span className="flex items-center gap-2 text-amber-600 font-semibold">
+                  <span className="material-symbols-outlined">
+                    pending
+                  </span>
+                  Pending
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span>Clearance Fee</span>
+
+              {transaction ? (
+                <span className="flex items-center gap-2 text-emerald-600 font-semibold">
+                  <span className="material-symbols-outlined">
+                    check_circle
+                  </span>
+                  Paid
+                </span>
+              ) : (
+                <span className="flex items-center gap-2 text-amber-600 font-semibold">
+                  <span className="material-symbols-outlined">
+                    pending
+                  </span>
+                  Pending
+                </span>
+              )}
+            </div>
+
+          </div>
+
+        </div>
+
+        <Link
+          href="/student-dashboard"
+          className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-xl"
+        >
+          <span className="material-symbols-outlined text-lg">
+            dashboard
+          </span>
+          Return to Dashboard
+        </Link>
+
       </div>
     );
   }
