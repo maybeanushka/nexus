@@ -37,9 +37,23 @@ export default function AdminTable({ applications, adminRole }: { applications: 
 
   if (applications.length === 0) {
     return (
-      <div className="text-center p-12 border-2 border-dashed border-slate-100 rounded-2xl">
-        <span className="material-symbols-outlined text-4xl text-slate-200 mb-2">inventory_2</span>
-        <p className="text-slate-400 font-bold text-sm tracking-tight">Queue is empty. No applications pending.</p>
+      <div className="rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50 py-20 text-center">
+
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
+          <span className="material-symbols-outlined text-5xl text-emerald-600">
+            task_alt
+          </span>
+        </div>
+
+        <h3 className="text-2xl font-black text-slate-900">
+          You're all caught up!
+        </h3>
+
+        <p className="mx-auto mt-3 max-w-md text-slate-500">
+          There are currently no student applications awaiting your review.
+          New submissions will automatically appear here.
+        </p>
+
       </div>
     );
   }
@@ -104,11 +118,20 @@ export default function AdminTable({ applications, adminRole }: { applications: 
                   <td className="py-5 px-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs uppercase">
-                        {app.student_name.substring(0, 2)}
+                        {app.student_name
+                        .split(" ")
+                        .map((n: string) => n[0])
+                        .slice(0,2)
+                        .join("")
+                        .toUpperCase()}
                       </div>
                       <div>
                         <div className="font-bold text-sm text-slate-900 group-hover:text-primary transition-colors">{app.student_name}</div>
-                        <div className="text-xs text-slate-400 font-medium">{app.student_email}</div>
+                        <div className="text-xs text-slate-400 font-medium">{app.student_email}
+                          <p className="text-[11px] text-slate-400 font-mono mt-1">
+                          #{app.id.slice(-6).toUpperCase()}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -118,16 +141,24 @@ export default function AdminTable({ applications, adminRole }: { applications: 
                       currentStageStatus === 'rejected' ? 'bg-rose-50 text-rose-700' : 
                       'bg-indigo-50 text-primary'
                     }`}>
-                      <span className="w-1 h-1 rounded-full bg-current animate-pulse"></span>
-                      {currentStageStatus}
+                      <span className="w-1 h-1 rounded-full bg-current"></span>
+                      {currentStageStatus === "pending"
+                      ? "Pending Review"
+                      : currentStageStatus === "approved"
+                      ? "Approved"
+                      : "Rejected"}
                     </span>
                   </td>
-                  <td className="py-5 px-4 text-sm text-slate-500 font-bold">
-                    {new Date(app.submitted_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                  <td className="py-5 px-8 text-sm text-slate-500 font-bold">
+                    {new Intl.DateTimeFormat("en-GB",{
+                    day:"2-digit",
+                    month:"short",
+                    year:"numeric"
+                  }).format(new Date(app.submitted_at))}
                   </td>
                   <td className="py-5 px-4 text-right">
-                    <Link href={`/admin-portal/review/${app.id}`} className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 hover:border-primary hover:text-primary rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm hover:shadow-md group/btn">
-                      Begin Review 
+                    <Link href={`/admin-portal/review/${app.id}`} className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white border border-primary text-slate-700 hover:bg-indigo-700 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm hover:shadow-md group/btn">
+                      Review 
                       <span className="material-symbols-outlined text-[16px] transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
                     </Link>
                   </td>
