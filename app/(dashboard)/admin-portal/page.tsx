@@ -63,21 +63,48 @@ export default async function AdminPortal() {
             </h2>
             <p className="text-slate-500 text-sm mt-1">Authorized Access: {session.name}</p>
           </div>
-          <div className="flex gap-4">
-            <div className="bg-slate-100 px-4 py-2 rounded-lg border border-slate-200 text-center min-w-[120px]">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pending</p>
-              <p className="text-xl font-black text-slate-800">{pendingApplications.length}</p>
+          <div className="grid grid-cols-2 gap-4 w-full lg:w-auto">
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-4 text-center min-w-[130px]">
+              <span className="material-symbols-outlined text-amber-600 text-3xl">
+                pending_actions
+              </span>
+
+              <p className="mt-2 text-3xl font-black text-amber-700">
+                {pendingApplications.length}
+              </p>
+
+              <p className="text-xs font-bold uppercase tracking-widest text-amber-600">
+                Pending
+              </p>
             </div>
+
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-center min-w-[130px]">
+              <span className="material-symbols-outlined text-emerald-600 text-3xl">
+                verified
+              </span>
+
+              <p className="mt-2 text-3xl font-black text-emerald-700">
+                —
+              </p>
+
+              <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">
+                Reviewed Today
+              </p>
+            </div>
+
           </div>
         </div>
       </section>
 
-      <div className="aether-card rounded-2xl p-8">
+      <div className="aether-card rounded-3xl !bg-primary/5 p-8 shadow-sm">
         <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
           <span className="material-symbols-outlined text-primary">list_alt</span>
           Pending Applications
         </h3>
-        
+        <p className="mb-8 text-sm text-slate-500">
+        Review student applications assigned to your approval stage.
+        Applications are processed in submission order.
+        </p>
         <AdminTable applications={pendingApplications} adminRole={session.role} />
       </div>
     </>
