@@ -77,32 +77,35 @@
     visibility: hidden;
   }
 
-  #receipt,
-  #receipt * {
+  .print-document,
+  .print-document * {
     visibility: visible;
   }
 
-  #receipt {
-    position: fixed;
+  .print-document {
+    position: absolute;
     left: 0;
     top: 0;
 
     width: 210mm;
-    height: 297mm;
+    min-height: 297mm;
 
     padding: 18mm;
 
     box-sizing: border-box;
 
+    background: white;
+
     border: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
+  }
 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    background: white;
+  nav,
+  aside,
+  header,
+  footer {
+    display: none !important;
   }
 
   table,
@@ -112,13 +115,5 @@
   img {
     break-inside: avoid;
     page-break-inside: avoid;
-  }
-
-  nav,
-  aside,
-  header,
-  footer,
-  main > *:not(#receipt) {
-    display: none !important;
   }
 }

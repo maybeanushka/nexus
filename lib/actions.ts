@@ -89,13 +89,19 @@ export async function submitApplication(prevState: any, formData: FormData) {
     return { error: "Only students can submit applications." };
   }
   const studentId = session.userId;
-  const isResubmission = formData.get('isResubmission') === 'true';
   
   const idCard = formData.get('idCard') as File;
   const libraryReceipt = formData.get('libraryReceipt') as File;
   const labRecords = formData.get('labRecords') as File;
 
-  const existing = await Application.findOne({ student_id: studentId }).sort({ submitted_at: -1 }).lean() as any;
+  const applications = await Application.find({ student_id: studentId })
+  .sort({ submitted_at: -1 })
+  .lean();
+
+  console.log("ALL APPLICATIONS");
+  console.log(applications);
+
+  const existing = applications[0] as any;
   
   if (existing && existing.overall_status === 'approved') {
     return { error: 'Clearance already obtained' };
@@ -119,52 +125,109 @@ export async function submitApplication(prevState: any, formData: FormData) {
 
     if (!idUrl || !libUrl || !labUrl) return { error: 'All documents are required' };
 
-    if (!isResubmission && existing && existing.overall_status === 'pending') {
-      return { error: 'You already have a pending application. Please wait for review.' };
-    }
+    if (existing) {
+      if (existing.overall_status === "approved") {
+        return { error: "Clearance already obtained." };
+      }
 
-    if (isResubmission && existing) {
+      if (existing.overall_status === "pending") {
+        return {
+          error: "You already have a pending application. Please wait for review."
+        };
+      }
+
+      // Rejected application
       const updateData: any = {
-        overall_status: 'pending',
-        submitted_at: new Date()
+        overall_status: "pending",
+        submitted_at: new Date(),
+        last_rejected_stage: null
       };
-      if (existing.lab_status === 'rejected') updateData.lab_status = 'pending';
-      if (existing.hod_status === 'rejected') updateData.hod_status = 'pending';
-      if (existing.principal_status === 'rejected') updateData.principal_status = 'pending';
+
+      switch (existing.last_rejected_stage) {
+
+        case "lab":
+          updateData.lab_status = "pending";
+          break;
+
+        case "hod":
+          updateData.hod_status = "pending";
+          break;
+
+        case "principal":
+          updateData.principal_status = "pending";
+          break;
+
+        default:
+          updateData.lab_status = "pending";
+          updateData.hod_status = "pending";
+          updateData.principal_status = "pending";
+      }
 
       await Application.findByIdAndUpdate(existing._id, updateData);
-      
-      await DocumentModel.updateOne({ application_id: existing._id, doc_type: 'id_card' }, { file_url: idUrl });
-      await DocumentModel.updateOne({ application_id: existing._id, doc_type: 'library_receipt' }, { file_url: libUrl });
-      await DocumentModel.updateOne({ application_id: existing._id, doc_type: 'lab_records' }, { file_url: labUrl });
+
+      await DocumentModel.updateOne(
+        { application_id: existing._id, doc_type: "id_card" },
+        { file_url: idUrl }
+      );
+
+      await DocumentModel.updateOne(
+        { application_id: existing._id, doc_type: "library_receipt" },
+        { file_url: libUrl }
+      );
+
+      await DocumentModel.updateOne(
+        { application_id: existing._id, doc_type: "lab_records" },
+        { file_url: labUrl }
+      );
 
       await AuditLog.create({
+        _id: crypto.randomUUID(),
         application_id: existing._id,
-        action: 'resubmitted',
-        remarks: 'Student updated documents and resubmitted for review.'
+        action: "resubmitted",
+        remarks: "Student updated documents and resubmitted."
       });
+
     } else {
+
+      // FIRST EVER APPLICATION
+
       const appId = crypto.randomUUID();
-      const app = await Application.create({
+
+      await Application.create({
         _id: appId,
-        student_id: studentId,
-        lab_status: 'pending',
-        hod_status: 'pending',
-        principal_status: 'pending',
-        overall_status: 'pending'
+        student_id: session.userId,
+        lab_status: "pending",
+        hod_status: "pending",
+        principal_status: "pending",
+        overall_status: "pending"
       });
 
       await DocumentModel.insertMany([
-        { _id: crypto.randomUUID(), application_id: appId, doc_type: 'id_card', file_url: idUrl },
-        { _id: crypto.randomUUID(), application_id: appId, doc_type: 'library_receipt', file_url: libUrl },
-        { _id: crypto.randomUUID(), application_id: appId, doc_type: 'lab_records', file_url: labUrl }
+        {
+          _id: crypto.randomUUID(),
+          application_id: appId,
+          doc_type: "id_card",
+          file_url: idUrl
+        },
+        {
+          _id: crypto.randomUUID(),
+          application_id: appId,
+          doc_type: "library_receipt",
+          file_url: libUrl
+        },
+        {
+          _id: crypto.randomUUID(),
+          application_id: appId,
+          doc_type: "lab_records",
+          file_url: labUrl
+        }
       ]);
 
       await AuditLog.create({
         _id: crypto.randomUUID(),
         application_id: appId,
-        action: 'submitted',
-        remarks: 'Student submitted documents for clearance.'
+        action: "submitted",
+        remarks: "Student submitted documents."
       });
     }
 
@@ -223,18 +286,29 @@ export async function reviewApplication(applicationId: string, status: 'approved
   const appData = await Application.findById(applicationId).populate('student_id').lean() as any;
   if (!appData) throw new Error("Application not found");
 
-  let overallStatus = 'pending';
-  if (status === 'rejected') {
-    overallStatus = 'rejected';
-  } else if (adminRole === 'principal_admin' && status === 'approved') {
-    overallStatus = 'approved';
-  } else {
-    overallStatus = appData.overall_status || 'pending';
-  }
+  let overallStatus = "pending";
+  let lastRejectedStage = null;
 
+  if (status === "rejected") {
+    overallStatus = "rejected";
+
+    if (adminRole === "lab_admin") {
+      lastRejectedStage = "lab";
+    } else if (adminRole === "hod_admin") {
+      lastRejectedStage = "hod";
+    } else if (adminRole === "principal_admin") {
+      lastRejectedStage = "principal";
+    }
+
+  } else if (adminRole === "principal_admin") {
+    overallStatus = "approved";
+  } else {
+    overallStatus = appData.overall_status || "pending";
+  }
   await Application.findByIdAndUpdate(applicationId, {
     [stageColumn]: status,
     overall_status: overallStatus,
+    last_rejected_stage: lastRejectedStage,
     reviewed_at: new Date()
   });
 

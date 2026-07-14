@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 import PrintButton from '@/components/PrintButton';
 import CopyLinkButton from './CopyLinkButton';
+import Image from "next/image";
 
 export default async function CertificatePage() {
   const session = await getSession();
@@ -115,27 +116,63 @@ export default async function CertificatePage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-black tracking-tight text-on-surface">Official Clearance Certificate</h2>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-5 mb-8">
+
+        <div>
+          <h2 className="text-3xl font-black">
+            Official Clearance Certificate
+          </h2>
+
+          <p className="text-slate-500 mt-2">
+            Digitally issued after successful completion of all institutional clearance requirements.
+          </p>
+        </div>
+
+        <div className="flex gap-3">
+
+          <PrintButton />
+        </div>
+
       </div>
 
-      <div id="certificate-to-print" className="bg-white border-8 border-slate-100 p-12 sm:p-24 rounded-[2rem] shadow-xl relative overflow-hidden text-center" style={{ backgroundImage: "radial-gradient(circle at center, rgba(131, 239, 225, 0.05) 0%, transparent 100%)" }}>
+      <div id="certificate-to-print" className="print-document bg-white border-[14px] border-slate-100 p-10 sm:p-24 rounded-[30px] shadow-2xl relative overflow-hidden text-center" style={{ backgroundImage: "radial-gradient(circle at center, rgba(131, 239, 225, 0.05) 0%, transparent 100%)" }}>
         
         {/* Certificate Watermark */}
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-          <span className="material-symbols-outlined" style={{ fontSize: '400px', fontVariationSettings: "'FILL' 1" }}>verified_user</span>
+          <span className="material-symbols-outlined" style={{ fontSize: '460px', fontVariationSettings: "'FILL' 1" }}>verified_user</span>
         </div>
 
         <div className="relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-widest text-slate-900 mb-2">Nexus Protocol</h1>
+          <div className="flex justify-center" >
+            <Image
+                    src="/nexusdarklogo.png"
+                    alt="Nexus"
+                    width={110}
+                    height={110}
+                    priority
+                  />
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-widest text-slate-900 mb-2">Nexus</h1>
           <p className="text-primary font-bold tracking-[0.2em] uppercase text-sm mb-16">Certificate of Clearance</p>
 
           <p className="text-lg text-slate-600 mb-4">This is to certify that</p>
           <h2 className="text-4xl font-bold text-slate-900 mb-4 pb-2 border-b-2 border-slate-200 inline-block px-12">{session.name}</h2>
           
-          <p className="text-lg text-slate-600 max-w-lg mx-auto leading-relaxed mb-16">
-            has successfully completed all required verification stages and is hereby granted full clearance from the institution. All dues and protocols have been settled.
+          <p className="text-lg text-slate-600  mx-auto leading-relaxed mb-16">
+            has successfully completed all required verification stages and is hereby granted full clearance from the institution. This certificate confirms that the student has no outstanding administrative, laboratory, or library obligations and is officially cleared by the institution.
           </p>
+
+          <div className="mt-10 space-y-2">
+
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
+            Certificate Number
+            </p>
+
+            <p className="font-mono font-bold tracking-wider text-slate-700">
+            {application._id.toUpperCase()}
+            </p>
+
+           </div>
 
           <div className="flex justify-between items-end mt-24">
             <div className="text-left">
