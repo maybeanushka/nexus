@@ -14,9 +14,10 @@ export default async function SubmitApplicationPage() {
     await dbConnect();
 
     const existing = await Application.findOne({
-      student_id: session.userId,
-      overall_status: { $ne: 'rejected' }
-    }).sort({ submitted_at: -1 }).lean() as any;
+      student_id: session.userId
+    })
+    .sort({ submitted_at: -1 })
+    .lean() as any;
 
     return (
       <section>
@@ -38,7 +39,9 @@ export default async function SubmitApplicationPage() {
             </Link>
           </div>
         ) : (
-          <SubmitForm isResubmission={existing?.overall_status === 'rejected'} />
+          <SubmitForm
+            mode={existing?.overall_status === "rejected" ? "resubmit" : "new"}
+          />
         )}
       </section>
     );

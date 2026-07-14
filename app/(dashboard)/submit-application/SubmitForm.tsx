@@ -3,7 +3,12 @@
 import { useActionState, useState } from 'react';
 import { submitApplication } from '@/lib/actions';
 
-export default function SubmitForm({ isResubmission }: { isResubmission?: boolean }) {
+type SubmitFormProps = {
+  mode: "new" | "resubmit";
+};
+
+export default function SubmitForm({ mode }: SubmitFormProps) {
+  const isResubmission = mode === "resubmit";
   const [state, formAction, isPending] = useActionState(submitApplication, null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -76,7 +81,6 @@ export default function SubmitForm({ isResubmission }: { isResubmission?: boolea
       </div>
 
       <form action={formAction} className="space-y-4">
-        <input type="hidden" name="isResubmission" value={isResubmission ? 'true' : 'false'} />
         
         {state?.error && (
           <div className="p-4 bg-rose-50 text-rose-600 font-bold rounded-xl text-sm border border-rose-100 flex items-center gap-2">
@@ -111,7 +115,7 @@ export default function SubmitForm({ isResubmission }: { isResubmission?: boolea
             <input 
               type="file" 
               name={field.name} 
-              required={!isResubmission} 
+              required={mode ==="new"} 
               accept=".pdf,image/jpeg,image/png" 
               onChange={handleFileChange}
               className={`w-full rounded-2xl border-2 border-dashed py-3 px-4 bg-slate-50 text-sm text-slate-900 cursor-pointer transition-all duration-200 outline-none

@@ -26,6 +26,11 @@ const applicationSchema = new Schema({
   hod_status: { type: String, default: 'pending', enum: ['pending', 'approved', 'rejected'] },
   principal_status: { type: String, default: 'pending', enum: ['pending', 'approved', 'rejected'] },
   overall_status: { type: String, default: 'pending', enum: ['pending', 'approved', 'rejected'] },
+  last_rejected_stage: {
+    type: String,
+    enum: ['lab', 'hod', 'principal', null],
+    default: null
+  },
   last_nudge_at: Date,
   submitted_at: { type: Date, default: Date.now },
   reviewed_at: Date

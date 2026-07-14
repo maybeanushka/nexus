@@ -19,7 +19,7 @@ export default async function ReceiptPage({ params }: { params: { id: string } }
 
   return (
     <div className="min-h-screen bg-slate-50 p-10 flex items-center justify-center">
-      <div id="receipt" className="bg-white max-w-[950px] w-full p-12 shadow-2xl rounded-sm border border-slate-200 relative overflow-hidden">
+      <div id="receipt" className="print-document bg-white max-w-[950px] w-full p-12 shadow-2xl rounded-sm border border-slate-200 relative overflow-hidden">
         {/* Security Watermark */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.015] rotate-[-45deg] pointer-events-none select-none">
           <p className="text-7xl font-black">NEXUS SECURE</p>
