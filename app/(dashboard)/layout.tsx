@@ -2,10 +2,25 @@ import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import TopNav from '@/components/TopNav';
+import dbConnect from "@/lib/db";
+import { Notification } from "@/lib/models";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
-  
+  if (!session) {
+    redirect("/login");
+  }
+  await dbConnect();
+  const notifications = await Notification.find({
+    user_id: session?.userId,
+  })
+    .sort({ created_at: -1 })
+    .limit(5)
+    .lean();
+  const unreadCount = await Notification.countDocuments({
+    user_id: session.userId,
+    read: false,
+  });
   if (!session) {
     redirect('/login');
   }
@@ -13,7 +28,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="bg-background text-on-surface font-body min-h-screen">
       <Sidebar user={session} />
-      <TopNav user={session} />
+      <TopNav user={session} notifications={JSON.parse(JSON.stringify(notifications))} unreadCount={unreadCount} />
       <main id="dashboard-content" className="ml-64 pt-22 px-10 pb-8 min-h-screen">
         {children}
       </main>

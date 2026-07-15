@@ -2,19 +2,21 @@
 
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
-import { bulkApprove } from '@/lib/actions';
+import { bulkApprove, bulkReject } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 
 export default function AdminTable({ applications, adminRole }: { applications: any[], adminRole: string }) {
   const [selected, setSelected] = useState<string[]>([]);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const toggleSelectAll = () => {
-    if (selected.length === applications.length) {
+    if (selected.length === filteredApplications.length) {
       setSelected([]);
     } else {
-      setSelected(applications.map(a => a.id));
+      setSelected(filteredApplications.map((a) => a.id));
     }
   };
 
@@ -34,6 +36,35 @@ export default function AdminTable({ applications, adminRole }: { applications: 
       router.refresh();
     });
   };
+
+  const handleBulkReject = () => {
+    if (selected.length < 2) return;
+
+    startTransition(async () => {
+      await bulkReject(selected);
+      setSelected([]);
+      router.refresh();
+    });
+  };
+
+  const getCurrentStatus = (app: any) => {
+    if (adminRole === "lab_admin") return app.lab_status;
+    if (adminRole === "hod_admin") return app.hod_status;
+    if (adminRole === "principal_admin") return app.principal_status;
+    return "pending";
+  };
+
+  const filteredApplications = applications.filter((app) => {
+    const matchesSearch =
+      app.student_name.toLowerCase().includes(search.toLowerCase()) ||
+      app.student_email.toLowerCase().includes(search.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      getCurrentStatus(app) === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   if (applications.length === 0) {
     return (
@@ -61,23 +92,45 @@ export default function AdminTable({ applications, adminRole }: { applications: 
   return (
     <div className="relative">
       {/* Floating Bulk Action Bar - Only shows when 2 or more are selected */}
-      <div className={`sticky top-4 z-30 mb-6 transition-all duration-500 ease-out transform ${selected.length > 1 ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0 pointer-events-none'}`}>
+      <div
+        className={`mt-3 mb-6 transition-all duration-300 ${
+          selected.length > 1 ? "block" : "hidden"
+        }`}
+      >
         <div className="bg-slate-900 text-white p-4 rounded-2xl shadow-2xl flex justify-between items-center border border-white/10">
           <div className="flex items-center gap-4 pl-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-black text-xs">
               {selected.length}
             </div>
-            <span className="text-sm font-bold tracking-tight">Protocol instances selected for batch approval</span>
+            <span className="text-sm font-bold tracking-tight">{selected.length} applications selected</span>
           </div>
-          <button 
-            onClick={handleBulkApprove} 
-            disabled={isPending}
-            className="px-6 py-2 bg-primary hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
-          >
-            {isPending ? 'Processing Batch...' : 'Execute Bulk Approval'}
-            <span className="material-symbols-outlined text-[18px]">done_all</span>
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={handleBulkApprove}
+              disabled={isPending}
+              className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-xl text-white font-bold"
+            >
+              Bulk Approve
+            </button>
+
+            <button
+              className="px-6 py-2 bg-rose-600 hover:bg-rose-700 rounded-xl text-white font-bold"
+            >
+              Bulk Reject
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div className="mt-3 mb-5 flex flex-col md:flex-row justify-between gap-4">
+
+        <input
+          type="text"
+          placeholder="Search student..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full bg-white rounded-xl border border-slate-200 shadow-sm px-4 py-2 text-sm"
+        />
       </div>
 
       <div className="overflow-hidden aether-card rounded-2xl">
@@ -87,7 +140,7 @@ export default function AdminTable({ applications, adminRole }: { applications: 
               <th className="py-5 px-6 w-12 text-center">
                 <input 
                   type="checkbox" 
-                  checked={selected.length === applications.length && applications.length > 0}
+                  checked={selected.length === filteredApplications.length && filteredApplications.length > 0}
                   onChange={toggleSelectAll}
                   className="w-5 h-5 accent-primary rounded-lg cursor-pointer"
                 />
@@ -99,11 +152,8 @@ export default function AdminTable({ applications, adminRole }: { applications: 
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {applications.map((app, index) => {
-              let currentStageStatus = 'pending';
-              if (adminRole === 'lab_admin') currentStageStatus = app.lab_status;
-              if (adminRole === 'hod_admin') currentStageStatus = app.hod_status;
-              if (adminRole === 'principal_admin') currentStageStatus = app.principal_status;
+            {filteredApplications.map((app, index) => {
+              const currentStageStatus = getCurrentStatus(app);
 
               return (
                 <tr key={app.id} className={`group transition-all duration-300 hover:bg-slate-50/80 ${selected.includes(app.id) ? 'bg-primary/5' : ''}`}>

@@ -36,6 +36,27 @@ export default async function AdminPortal() {
     query.principal_status = 'pending';
   }
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const [
+    pendingCount,
+    approvedToday,
+    rejectedToday,
+  ] = await Promise.all([
+    Application.countDocuments(query),
+
+    Application.countDocuments({
+      reviewed_at: { $gte: today },
+      overall_status: "approved",
+    }),
+
+    Application.countDocuments({
+      reviewed_at: { $gte: today },
+      overall_status: "rejected",
+    }),
+  ]);
+  const reviewedToday = approvedToday + rejectedToday;
+
   const applicationsDoc = await Application.find(query)
     .populate('student_id')
     .sort({ submitted_at: 1 })
@@ -51,7 +72,7 @@ export default async function AdminPortal() {
   return (
     <>
       {/* Administrative Control Header */}
-      <section className="mb-10 border-b border-slate-200 pb-8">
+      <section className="mb-5 border-b border-slate-200 pb-8">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div>
             <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-[0.2em] mb-3">
@@ -63,14 +84,14 @@ export default async function AdminPortal() {
             </h2>
             <p className="text-slate-500 text-sm mt-1">Authorized Access: {session.name}</p>
           </div>
-          <div className="grid grid-cols-2 gap-4 w-full lg:w-auto">
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-4 text-center min-w-[130px]">
-              <span className="material-symbols-outlined text-amber-600 text-3xl">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full lg:w-auto">
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-1 py-3 text-center min-w-[110px]">
+              <span className="material-symbols-outlined text-amber-600 text-xl">
                 pending_actions
               </span>
 
-              <p className="mt-2 text-3xl font-black text-amber-700">
-                {pendingApplications.length}
+              <p className="text-3xl font-black text-amber-700">
+                {pendingCount}
               </p>
 
               <p className="text-xs font-bold uppercase tracking-widest text-amber-600">
@@ -78,30 +99,57 @@ export default async function AdminPortal() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-center min-w-[130px]">
-              <span className="material-symbols-outlined text-emerald-600 text-3xl">
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-1 py-3 text-center min-w-[110px]">
+              <span className="material-symbols-outlined text-emerald-600 text-xl">
                 verified
               </span>
 
-              <p className="mt-2 text-3xl font-black text-emerald-700">
-                —
+              <p className="text-3xl font-black text-emerald-700">
+                {approvedToday}
               </p>
 
               <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">
-                Reviewed Today
+                Approved Today
               </p>
             </div>
 
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-1 py-3 text-center min-w-[110px]">
+              <span className="material-symbols-outlined text-rose-600 text-xl">
+                cancel
+              </span>
+
+              <p className="text-3xl font-black text-rose-700">
+                {rejectedToday}
+              </p>
+
+              <p className="text-xs font-bold uppercase tracking-widest text-rose-600">
+                Rejected Today
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-blue-200 bg-blue-50 px-1 py-3 text-center min-w-[110px]">
+              <span className="material-symbols-outlined text-blue-600 text-xl">
+                description
+              </span>
+
+              <p className="text-3xl font-black text-blue-700">
+                {reviewedToday}
+              </p>
+
+              <p className="text-xs font-bold uppercase tracking-widest text-blue-600">
+                Total
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <div className="aether-card rounded-3xl !bg-primary/5 p-8 shadow-sm">
-        <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+      <div className="aether-card rounded-3xl !bg-primary/5 p-7 shadow-sm">
+        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
           <span className="material-symbols-outlined text-primary">list_alt</span>
           Pending Applications
         </h3>
-        <p className="mb-8 text-sm text-slate-500">
+        <p className="text-sm text-slate-500">
         Review student applications assigned to your approval stage.
         Applications are processed in submission order.
         </p>

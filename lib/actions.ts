@@ -2,7 +2,7 @@
 
 import dbConnect from './db';
 import { getSession } from "./auth";
-import { User, Application, DocumentModel, Due, Transaction, AuditLog } from './models';
+import { User, Application, DocumentModel, Due, Transaction, AuditLog, Notification} from './models';
 import bcrypt from 'bcryptjs';
 import { createSession, destroySession } from './auth';
 import { redirect } from 'next/navigation';
@@ -11,6 +11,7 @@ import crypto from 'crypto';
 import { uploadToS3 } from './s3';
 import mongoose from 'mongoose';
 import { env } from './env';
+import { createNotification } from "./notifications";
 
 export async function loginAction(prevState: any, formData: FormData) {
   await dbConnect();
@@ -187,6 +188,13 @@ export async function submitApplication(prevState: any, formData: FormData) {
         remarks: "Student updated documents and resubmitted."
       });
 
+      await createNotification({
+        userId: session.userId,
+        title: "Application Resubmitted",
+        message: "Your updated documents have been submitted for review.",
+        type: "info",
+      });
+
     } else {
 
       // FIRST EVER APPLICATION
@@ -228,6 +236,12 @@ export async function submitApplication(prevState: any, formData: FormData) {
         application_id: appId,
         action: "submitted",
         remarks: "Student submitted documents."
+      });
+      await createNotification({
+        userId: session.userId,
+        title: "Application Submitted",
+        message: "Your clearance application has been submitted successfully.",
+        type: "success",
       });
     }
 
@@ -322,6 +336,34 @@ export async function reviewApplication(applicationId: string, status: 'approved
 
   // Send notification to student
   await sendStudentNotification(appData.student_id.email, appData.student_id.name, stageName, status, notes);
+  if (status === "approved") {
+    await createNotification({
+      userId: appData.student_id._id,
+      title: `${stageName} Approved`,
+      message: `Your application has been approved by ${stageName}.`,
+      type: "success",
+    });
+
+    if (adminRole === "principal_admin") {
+      await createNotification({
+        userId: appData.student_id._id,
+        title: "Certificate Ready",
+        message:
+          "Congratulations! Your clearance certificate is now available for download.",
+        type: "success",
+      });
+    }
+  } else {
+    await createNotification({
+      userId: appData.student_id._id,
+      title: `${stageName} Rejected`,
+      message:
+        notes && notes.trim().length > 0
+          ? `Your application was rejected by ${stageName}. Reason: ${notes}`
+          : `Your application was rejected by ${stageName}.`,
+      type: "error",
+    });
+  }
 
   return true;
 }
@@ -558,6 +600,67 @@ export async function bulkApprove(applicationIds: string[]) {
   return true;
 }
 
+export async function bulkReject(applicationIds: string[]) {
+  await dbConnect();
+  const session = await getSession();
+
+  if (!session) {
+    throw new Error("You must be logged in.");
+  }
+  if (
+    !["lab_admin", "hod_admin", "principal_admin"].includes(session.role)
+  ) {
+    throw new Error("Unauthorized");
+  }
+
+  const adminId = session.userId;
+  const adminRole = session.role;
+  const stageName = adminRole === 'lab_admin' ? 'Laboratory In-charge' : adminRole === 'hod_admin' ? 'Head of Department' : 'Office of the Principal';
+  
+  for (const id of applicationIds) {
+    const app = await Application.findById(id).lean() as any;
+    if (!app) continue;
+    
+    const pendingDues = await Due.findOne({ student_id: app.student_id, status: 'pending' }).lean();
+    if (pendingDues) {
+      throw new Error(`Cannot approve application ${id.substring(0, 8)}: Student has pending financial dues.`);
+    }
+  }
+
+  const appsToNotify = await Application.find({ _id: { $in: applicationIds } }).populate('student_id').lean() as any[];
+
+  for (const id of applicationIds) {
+    let stageColumn = adminRole === 'lab_admin' ? 'lab_status' : adminRole === 'hod_admin' ? 'hod_status' : 'principal_status';
+    
+    let overallStatus = 'pending';
+    if (adminRole === 'principal_admin') overallStatus = 'rejected';
+    else {
+      const currentApp = await Application.findById(id).lean() as any;
+      overallStatus = currentApp?.overall_status || 'pending';
+    }
+
+    await Application.findByIdAndUpdate(id, {
+      [stageColumn]: 'rejected',
+      overall_status: overallStatus,
+      reviewed_at: new Date()
+    });
+
+    await AuditLog.create({
+      _id: crypto.randomUUID(),
+      application_id: id,
+      actor_id: adminId,
+      action: `${adminRole}_rejected`,
+      remarks: 'Bulk Rejected'
+    });
+  }
+
+  for (const app of appsToNotify) {
+    await sendStudentNotification(app.student_id.email, app.student_id.name, stageName, 'rejected');
+  }
+
+  return true;
+}
+
 export async function payAllDuesAction() {
   await dbConnect();
 
@@ -607,4 +710,21 @@ export async function payAllDuesAction() {
     success: true,
     transactionId,
   };
+}
+
+export async function markNotificationsRead() {
+  await dbConnect();
+
+  const session = await getSession();
+  if (!session) return;
+
+  await Notification.updateMany(
+    {
+      user_id: session.userId,
+      read: false,
+    },
+    {
+      $set: { read: true },
+    }
+  );
 }
