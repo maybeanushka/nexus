@@ -88,6 +88,43 @@ const auditLogSchema = new Schema({
   created_at: { type: Date, default: Date.now }
 });
 
+// Notification Schema
+const notificationSchema = new Schema({
+  _id: { type: String, required: true },
+
+  user_id: {
+    type: String,
+    ref: "User",
+    required: true,
+  },
+
+  title: {
+    type: String,
+    required: true,
+  },
+
+  message: {
+    type: String,
+    required: true,
+  },
+
+  type: {
+    type: String,
+    enum: ["success", "info", "warning", "error"],
+    default: "info",
+  },
+
+  read: {
+    type: Boolean,
+    default: false,
+  },
+
+  created_at: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 // Session Schema
 const sessionSchema = new Schema({
   _id: { type: String, required: true },
@@ -113,5 +150,13 @@ export const Transaction = mongoose.model('Transaction', transactionSchema);
 if (mongoose.models.AuditLog) delete mongoose.models.AuditLog;
 export const AuditLog = mongoose.model('AuditLog', auditLogSchema);
 
+if (mongoose.models.Notification) delete mongoose.models.Notification;
+export const Notification = mongoose.model(
+  "Notification",
+  notificationSchema
+);
+
 if (mongoose.models.Session) delete mongoose.models.Session;
 export const Session = mongoose.model('Session', sessionSchema);
+
+
