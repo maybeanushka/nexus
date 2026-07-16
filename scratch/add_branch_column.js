@@ -3,7 +3,6 @@ const db = sqlite3('nexus.db');
 
 try {
     db.prepare("ALTER TABLE users ADD COLUMN branch TEXT").run();
-    console.log("Successfully added 'branch' column to 'users' table.");
 } catch (e) {
     if (e.message.includes('duplicate column name')) {
         console.log("'branch' column already exists.");

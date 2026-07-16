@@ -10,8 +10,12 @@ import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
 import { uploadToS3 } from './s3';
 import mongoose from 'mongoose';
-import { env } from './env';
 import { createNotification } from "./notifications";
+import {
+  sendStudentNotification,
+  sendSubmissionEmail,
+  sendCertificateEmail,
+} from "@/lib/email";
 
 export async function loginAction(prevState: any, formData: FormData) {
   await dbConnect();
@@ -99,9 +103,6 @@ export async function submitApplication(prevState: any, formData: FormData) {
   .sort({ submitted_at: -1 })
   .lean();
 
-  console.log("ALL APPLICATIONS");
-  console.log(applications);
-
   const existing = applications[0] as any;
   
   if (existing && existing.overall_status === 'approved') {
@@ -188,6 +189,11 @@ export async function submitApplication(prevState: any, formData: FormData) {
         remarks: "Student updated documents and resubmitted."
       });
 
+      await sendSubmissionEmail(
+        session.email,
+        session.name
+      );
+
       await createNotification({
         userId: session.userId,
         title: "Application Resubmitted",
@@ -237,6 +243,10 @@ export async function submitApplication(prevState: any, formData: FormData) {
         action: "submitted",
         remarks: "Student submitted documents."
       });
+      await sendSubmissionEmail(
+        session.email,
+        session.name
+      );
       await createNotification({
         userId: session.userId,
         title: "Application Submitted",
@@ -251,28 +261,6 @@ export async function submitApplication(prevState: any, formData: FormData) {
   }
 
   redirect('/student-dashboard');
-}
-
-async function sendStudentNotification(studentEmail: string, studentName: string, stage: string, status: string, notes: string = '') {
-  if (!env.FORMSPREE_ID) {
-    console.warn('FORMSPREE_ID is not configured. Skipping student notification.');
-    return;
-  }
-
-  try {
-    await fetch(`https://formspree.io/f/${env.FORMSPREE_ID}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        _subject: `Official Update: Clearance Protocol ${status.toUpperCase()} - ${stage}`,
-        recipient: studentName,
-        message: `Dear ${studentName},\n\nThis is an official update regarding your institutional clearance protocol. Your application has been ${status.toUpperCase()} by the ${stage}.\n\n${notes ? `Administrative Remarks: ${notes}\n\n` : ''}Please log in to your Nexus Dashboard to view the next steps or proceed with the settlement.\n\nInstitutional Registrar Services\nNexus Clearance Portal`,
-        student_email: studentEmail
-      })
-    });
-  } catch (e) {
-    console.error("Failed to notify student:", e);
-  }
 }
 
 export async function reviewApplication(applicationId: string, status: 'approved' | 'rejected', notes: string) {
@@ -352,6 +340,11 @@ export async function reviewApplication(applicationId: string, status: 'approved
           "Congratulations! Your clearance certificate is now available for download.",
         type: "success",
       });
+
+      await sendCertificateEmail(
+        appData.student_id.email,
+        appData.student_id.name
+      );
     }
   } else {
     await createNotification({

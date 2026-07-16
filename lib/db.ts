@@ -1,13 +1,6 @@
 import mongoose from 'mongoose';
-import { env } from './env';
+const MONGODB_URI = process.env.MONGODB_URI!;
 
-const { MONGODB_URI } = env;
-
-/**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections growing exponentially
- * during API Route usage.
- */
 let cached = (global as any).mongoose;
 
 if (!cached) {
@@ -31,7 +24,6 @@ async function dbConnect() {
       socketTimeoutMS: 5000,
       family: 4,
     }).then((mongoose) => {
-      console.log('✅ MongoDB Protocol Connected Successfully');
       return mongoose;
     }).catch((err) => {
       console.error('❌ MongoDB Connection Error:', err.message);
