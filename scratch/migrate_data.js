@@ -15,7 +15,6 @@ if (!MONGODB_URI) {
 
 async function migrate() {
   await mongoose.connect(MONGODB_URI);
-  console.log("Connected to MongoDB...");
 
   // Define models directly for migration
   const User = mongoose.model('User', new mongoose.Schema({ _id: String }, { strict: false }));
@@ -37,7 +36,6 @@ async function migrate() {
   ];
 
   for (const table of tables) {
-    console.log(`Migrating ${table.name}...`);
     try {
       const rows = db.prepare(`SELECT * FROM ${table.name}`).all();
       for (const row of rows) {
@@ -52,13 +50,10 @@ async function migrate() {
 
         await table.model.updateOne({ _id: mongoDoc._id }, mongoDoc, { upsert: true });
       }
-      console.log(`Successfully migrated ${rows.length} rows from ${table.name}`);
     } catch (e) {
       console.warn(`Could not migrate ${table.name}: ${e.message}`);
     }
   }
-
-  console.log("Migration COMPLETE!");
   process.exit(0);
 }
 

@@ -10,14 +10,11 @@ if (!MONGODB_URI) {
   process.exit(1);
 }
 
-console.log("Attempting to connect to MongoDB...");
-
 mongoose.connect(MONGODB_URI, {
   serverSelectionTimeoutMS: 5000,
   family: 4
 })
 .then(() => {
-  console.log("SUCCESS: Connected to MongoDB!");
   process.exit(0);
 })
 .catch(err => {
