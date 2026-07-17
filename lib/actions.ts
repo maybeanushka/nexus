@@ -654,57 +654,6 @@ export async function bulkReject(applicationIds: string[]) {
   return true;
 }
 
-export async function payAllDuesAction() {
-  await dbConnect();
-
-  const session = await getSession();
-
-  if (!session) {
-    return { error: "You must be logged in." };
-  }
-
-  const pendingDues = await Due.find({
-    student_id: session.userId,
-    status: "pending",
-  });
-
-  if (pendingDues.length === 0) {
-    return { error: "No pending dues." };
-  }
-
-  const totalAmount = pendingDues.reduce(
-    (sum, due) => sum + due.amount,
-    0
-  );
-
-  const transactionId = crypto.randomUUID();
-
-  await Transaction.create({
-    _id: transactionId,
-    student_id: session.userId,
-    amount: totalAmount,
-    qr_data: `RECEIPT-${transactionId.substring(0, 8).toUpperCase()}`,
-  });
-
-  await Due.updateMany(
-    {
-      student_id: session.userId,
-      status: "pending",
-    },
-    {
-      $set: {
-        status: "paid",
-        transaction_id: transactionId,
-      },
-    }
-  );
-
-  return {
-    success: true,
-    transactionId,
-  };
-}
-
 export async function markNotificationsRead() {
   await dbConnect();
 

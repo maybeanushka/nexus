@@ -43,10 +43,10 @@ export default function LibraryDuesList({ dues }: { dues: any[] }) {
                 </h3>
 
                 <span className="rounded-full text-rose-500 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                  {due.books.length} Books
+                  {(due.books ?? []).length} Books
                 </span>
               </div>
-              {due.books.map((book:any,index:number)=>(
+              {(due.books ?? []).map((book:any,index:number)=>(
                 <div key={index} className="flex items-start gap-4 rounded-xl py-5 px-2 transition hover:bg-slate-100">
 
                   <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
