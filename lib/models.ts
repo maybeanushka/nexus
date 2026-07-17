@@ -73,8 +73,21 @@ const transactionSchema = new Schema({
   _id: { type: String, required: true },
   student_id: { type: String, ref: 'User', required: true },
   amount: { type: Number, required: true },
+  razorpay_order_id: String,
+  razorpay_payment_id: {
+    type: String,
+    unique: true,
+  },
   qr_data: { type: String, required: true },
-  status: { type: String, default: 'success' },
+  status: {
+    type: String,
+    enum: ['success', 'failed', 'refunded'],
+    default: 'success',
+  },
+  paid_at: {
+    type: Date,
+    default: Date.now,
+  },
   created_at: { type: Date, default: Date.now }
 });
 
