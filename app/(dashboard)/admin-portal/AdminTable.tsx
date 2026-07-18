@@ -114,7 +114,9 @@ export default function AdminTable({ applications, adminRole }: { applications: 
             </button>
 
             <button
-              className="px-6 py-2 bg-rose-600 hover:bg-rose-700 rounded-xl text-white font-bold"
+              onClick={handleBulkReject}
+              disabled={isPending}
+              className="px-6 py-2 bg-rose-600 hover:bg-rose-700 rounded-xl text-white font-bold disabled:opacity-50"
             >
               Bulk Reject
             </button>

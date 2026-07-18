@@ -2,15 +2,17 @@
 
 import { payDuesAction } from '@/lib/actions';
 import { useState } from 'react';
+import { useRouter } from "next/navigation";
 
 export default function LibraryDuesList({ dues }: { dues: any[] }) {
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
+  const router = useRouter();
 
   const handlePay = async (dueId: string) => {
     setIsProcessing(dueId);
     const res = await payDuesAction(dueId);
     if (res.success) {
-      window.location.href = `/receipt/${res.transactionId}`;
+      router.push(`/receipt/${res.transactionId}`);
     }
     setIsProcessing(null);
   };
@@ -36,47 +38,74 @@ export default function LibraryDuesList({ dues }: { dues: any[] }) {
             className="rounded-2xl border border-slate-200 p-6 hover:border-primary/30 hover:shadow-md transition"
           >
 
-            <div className="divide-y divide-slate-100">
-              <div className="mb-5 flex items-center justify-between">
-                <h3 className="text-lg font-bold">
-                  Borrowed Books
-                </h3>
+            <div>
+              {due.books && due.books.length > 0 ? (
+                <>
+                  <div className="mb-5 flex items-center justify-between">
+                    <h3 className="text-lg font-bold">
+                      Borrowed Books
+                    </h3>
 
-                <span className="rounded-full text-rose-500 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                  {(due.books ?? []).length} Books
-                </span>
-              </div>
-              {(due.books ?? []).map((book:any,index:number)=>(
-                <div key={index} className="flex items-start gap-4 rounded-xl py-5 px-2 transition hover:bg-slate-100">
-
-                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-primary">
-                      menu_book
+                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                      {due.books.length} Book{due.books.length > 1 ? "s" : ""}
                     </span>
                   </div>
 
-                  <div>
-                    <p className="font-bold text-slate-900">
-                      {book.title}
-                    </p>
+                  <div className="divide-y divide-slate-100">
+                    {due.books.map((book: any, index: number) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-4 rounded-xl py-5 px-2 transition hover:bg-slate-100"
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 shrink-0">
+                          <span className="material-symbols-outlined text-primary">
+                            menu_book
+                          </span>
+                        </div>
 
-                    <p className="text-sm text-slate-500">
-                      {book.author}
-                    </p>
+                        <div>
+                          <p className="font-bold text-slate-900">
+                            {book.title}
+                          </p>
 
-                    <p className="text-xs font-bold text-rose-500 mt-1">
-                      Due: {new Intl.DateTimeFormat('en-GB', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                    }).format(new Date(book.due_date))}
-                    </p>
+                          <p className="text-sm text-slate-500">
+                            {book.author}
+                          </p>
 
+                          <p className="mt-1 text-xs font-bold text-rose-500">
+                            Due:{" "}
+                            {new Intl.DateTimeFormat("en-GB", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            }).format(new Date(book.due_date))}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mb-5 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                      <span className="material-symbols-outlined text-primary">
+                        description
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-bold">
+                      Due Details
+                    </h3>
                   </div>
 
-                </div>
-              ))}
-
+                  <div className="rounded-xl border border-slate-200 bg-primary/5 p-4">
+                    <p className="text-sm font-bold text-slate-700">
+                      {due.details || "No additional details available."}
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6">
@@ -90,12 +119,13 @@ export default function LibraryDuesList({ dues }: { dues: any[] }) {
 
                 <div>
                   <p className="text-xs uppercase tracking-wider text-slate-500">
-                    Outstanding Fine
+                    Outstanding Due
                   </p>
 
                   <p className="text-3xl font-black tracking-tight">
                     ₹{due.amount}
                   </p>
+                  
                 </div>
               </div>
 

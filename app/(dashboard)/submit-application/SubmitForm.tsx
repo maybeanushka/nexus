@@ -137,7 +137,7 @@ export default function SubmitForm({ mode }: SubmitFormProps) {
 
         <div className="mt-6 pt-2 border-t border-slate-100">
           <button disabled={isPending || isFormInvalid} className="w-full py-3 px-6 bg-primary text-white font-black text-[14px] uppercase tracking-widest rounded-xl shadow-lg hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95" type="submit">
-            {isPending ? 'Syncing with Secure Vault...' : isResubmission ? 'Resubmit for Review' : 'Submit Documents'}
+            {isPending ? 'Submitting application...' : isResubmission ? 'Resubmit for Review' : 'Submit Documents'}
             <span className="material-symbols-outlined text-lg">{isResubmission ? 'refresh' : 'cloud_upload'}</span>
           </button>
         </div>

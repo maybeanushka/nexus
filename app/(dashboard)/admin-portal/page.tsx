@@ -38,22 +38,37 @@ export default async function AdminPortal() {
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  let approvedQuery: any = {
+    reviewed_at: { $gte: today },
+  };
+
+  let rejectedQuery: any = {
+    reviewed_at: { $gte: today },
+  };
+
+  if (session.role === "lab_admin") {
+    approvedQuery.lab_status = "approved";
+    rejectedQuery.lab_status = "rejected";
+  }
+
+  if (session.role === "hod_admin") {
+    approvedQuery.hod_status = "approved";
+    rejectedQuery.hod_status = "rejected";
+  }
+
+  if (session.role === "principal_admin") {
+    approvedQuery.principal_status = "approved";
+    rejectedQuery.principal_status = "rejected";
+  }
+
   const [
     pendingCount,
     approvedToday,
     rejectedToday,
   ] = await Promise.all([
     Application.countDocuments(query),
-
-    Application.countDocuments({
-      reviewed_at: { $gte: today },
-      overall_status: "approved",
-    }),
-
-    Application.countDocuments({
-      reviewed_at: { $gte: today },
-      overall_status: "rejected",
-    }),
+    Application.countDocuments(approvedQuery),
+    Application.countDocuments(rejectedQuery),
   ]);
   const reviewedToday = approvedToday + rejectedToday;
 

@@ -33,13 +33,23 @@ export default function Sidebar({ user }: { user: any }) {
         {isAdmin ? (
           <>
             <Link href="/admin-portal" className={navClass("/admin-portal")}>
-              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>admin_panel_settings</span>
+              <span
+                className="material-symbols-outlined text-[22px]"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                admin_panel_settings
+              </span>
               <span>Admin Portal</span>
             </Link>
-            <Link href="/admin/library" className={navClass("/admin/library")}>
-              <span className="material-symbols-outlined text-[22px]">library_books</span>
-              <span>Library Admin</span>
-            </Link>
+
+            {user?.role === "lab_admin" && (
+              <Link href="/admin/library" className={navClass("/admin/library")}>
+                <span className="material-symbols-outlined text-[22px]">
+                  library_books
+                </span>
+                <span>Library Management</span>
+              </Link>
+            )}
           </>
         ) : (
           <>
