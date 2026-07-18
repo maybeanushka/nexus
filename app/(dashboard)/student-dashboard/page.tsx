@@ -3,7 +3,6 @@ import dbConnect from '@/lib/db';
 import { Application, Transaction, AuditLog, DocumentModel } from '@/lib/models';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import PaymentButton from './PaymentButton';
 import DownloadDocsButton from './DownloadDocsButton';
 
 export default async function StudentDashboard() {
@@ -40,7 +39,7 @@ export default async function StudentDashboard() {
   // Calculate Completion Percentage
   let completionPercentage = 0;
   if (application) {
-    completionPercentage += 20; // Documents Submission (Automatic if app exists)
+    completionPercentage += 20; 
     if (application.lab_status === 'approved') completionPercentage += 20;
     if (application.hod_status === 'approved') completionPercentage += 20;
     if (application.principal_status === 'approved') completionPercentage += 20;
@@ -124,12 +123,12 @@ export default async function StudentDashboard() {
           </div>
 
           {application ? (
-            <div className="relative flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4 px-4 py-8 bg-slate-50/50 rounded-3xl border border-slate-100">
+            <div className="relative flex flex-col md:flex-row  whitespace-pre-line justify-between items-center gap-8 md:gap-4 px-4 py-8 bg-slate-50/50 rounded-3xl border border-slate-100">
               {[
                 { id: 'docs', label: 'Documents Submission', status: 'approved', icon: 'cloud_done' },
                 { id: 'lab', label: 'Laboratory In-charge', status: application.lab_status, icon: 'verified' },
                 { id: 'hod', label: 'Head of Department', status: application.hod_status, icon: 'verified' },
-                { id: 'principal', label: 'Principal Office', status: application.principal_status, icon: 'verified' }
+                { id: 'principal', label: 'PrincipalOffice', status: application.principal_status, icon: 'verified' }
               ].map((stage, idx, arr) => (
                 <div key={stage.id} className="relative z-10 flex flex-col items-center group w-full max-w-[160px]">
                   <div className={`
@@ -235,7 +234,15 @@ export default async function StudentDashboard() {
                 <p className="text-sm text-slate-600 mb-6">Your clearance is approved. Please pay the processing fee to generate your certificate.</p>
 
                 {!transaction ? (
-                  <PaymentButton />
+                  <Link
+                    href="/fees"
+                    className="w-full inline-flex items-center justify-center gap-3 py-4 px-6 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-slate-800 active:scale-[0.98] transition-all"
+                  >
+                    Proceed to Payments
+                    <span className="material-symbols-outlined text-lg">
+                      arrow_forward
+                    </span>
+                  </Link>
                 ) : (
                   <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-teal-100">
                     <div className="flex items-center gap-3">

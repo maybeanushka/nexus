@@ -178,7 +178,7 @@ export default async function CertificatePage() {
             <div className="text-left">
               <div className="w-48 border-b-2 border-slate-300 mb-2"></div>
               <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Date Issued</p>
-              <p className="text-sm font-medium mt-1">{new Date(application.reviewed_at || Date.now()).toLocaleDateString()}</p>
+              <p className="text-sm font-medium mt-1">{new Date(application.reviewed_at ?? new Date()).toLocaleDateString()}</p>
               <p className="text-[10px] text-slate-400 mt-2 font-mono">TXN: {transaction.qr_data}</p>
             </div>
             

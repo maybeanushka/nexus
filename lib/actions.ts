@@ -324,29 +324,27 @@ export async function reviewApplication(applicationId: string, status: 'approved
 
   // Send notification to student
   await sendStudentNotification(appData.student_id.email, appData.student_id.name, stageName, status, notes);
-  if (status === "approved") {
+  if (adminRole === "principal_admin") {
+  const pendingDues = await Due.countDocuments({
+    student_id: appData.student_id._id,
+    status: "pending",
+  });
+
+  if (pendingDues === 0) {
     await createNotification({
       userId: appData.student_id._id,
-      title: `${stageName} Approved`,
-      message: `Your application has been approved by ${stageName}.`,
+      title: "Certificate Ready",
+      message:
+        "Congratulations! Your clearance certificate is now available for download.",
       type: "success",
     });
 
-    if (adminRole === "principal_admin") {
-      await createNotification({
-        userId: appData.student_id._id,
-        title: "Certificate Ready",
-        message:
-          "Congratulations! Your clearance certificate is now available for download.",
-        type: "success",
-      });
-
-      await sendCertificateEmail(
-        appData.student_id.email,
-        appData.student_id.name
-      );
-    }
-  } else {
+    await sendCertificateEmail(
+      appData.student_id.email,
+      appData.student_id.name
+    );
+  }
+} else {
     await createNotification({
       userId: appData.student_id._id,
       title: `${stageName} Rejected`,
